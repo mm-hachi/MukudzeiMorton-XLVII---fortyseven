@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "status": "Published",
+  "eyebrow": "Furniture 3D · Revit/BIM · AR configurators",
+  "headline": "Furniture options, made clear from screen to shop floor.",
+  "support": "Models, materials, BIM content and production-ready drawings, made in-house for furniture brands and the people who specify them.",
+  "photoAlt": "Portrait of the furniture 3D and BIM specialist",
+  "photoCaption": "Johannesburg · SAST · overlaps UK/EU and US mornings",
+  "audiences": [
+    { "title": "Manufacturers", "text": "Let customers configure a range and turn choices into a quote, cut list or drawing.", "href": "services/#configurators" },
+    { "title": "Architects & designers", "text": "Specify well-built Revit families and download useful project resources.", "href": "services/#revit-bim" },
+    { "title": "E-commerce teams", "text": "Add optimized 3D and AR product assets to a furniture catalogue.", "href": "services/#ar-models" },
+    { "title": "Have a product idea?", "text": "See the process, compare packages and send a concise project brief.", "href": "contact/" }
+  ],
+  "buildCards": [
+    { "title": "Revit families & BIM", "text": "Parametric furniture content with clear 2D and 3D representation.", "category": "Revit/BIM", "package": "Revit Family Starter" },
+    { "title": "Joinery & shop drawings", "text": "Plans, elevations, sections, hardware schedules and cut lists.", "category": "Shop drawings", "package": "Shop Drawing Set" },
+    { "title": "AR-ready models", "text": "Optimized GLB and USDZ assets prepared for product pages and AR.", "category": "AR models", "package": "AR-Ready Pack" },
+    { "title": "Product configurators", "text": "Finish options, pricing rules and manufacturing outputs in one flow.", "category": "Configurators", "package": "Configurator Starter" }
+  ],
+  "steps": [
+    { "title": "Brief", "text": "Share the product list, references, CAD or photographs, finishes and deadline." },
+    { "title": "Scope", "text": "Receive a written quote with deliverables, milestones and revision boundaries." },
+    { "title": "Build", "text": "Review working assets against the agreed brief and checkpoints." },
+    { "title": "Deliver", "text": "Receive organized files, notes and the agreed handover." }
+  ],
+  "faqs": []
+}

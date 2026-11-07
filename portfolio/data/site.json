@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "name": "Dekara Designs",
+  "owner": "TODO: owner name",
+  "role": "Furniture 3D, Revit/BIM & AR Configurator Specialist | Architectural Draughtsman",
+  "positioning": "I build 3D configurators and AR for furniture brands that lift conversion and cut returns, and I produce every asset in-house: models, materials, Revit/BIM content, and production-ready drawings.",
+  "location": "Johannesburg, South Africa",
+  "timezone": "SAST",
+  "overlap": "Overlaps UK/EU hours and US mornings",
+  "email": "",
+  "formEndpoint": "",
+  "bookingUrl": "",
+  "baseUrl": "https://mm-hachi.github.io/Studio/portfolio",
+  "currency": "USD",
+  "status": "Published"
+}

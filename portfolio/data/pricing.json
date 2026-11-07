@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "status": "Published",
+  "defaultCurrency": "USD",
+  "currencies": [
+    { "code": "USD", "label": "USD", "multiplier": 1, "symbol": "$" },
+    { "code": "GBP", "label": "GBP", "multiplier": 0.79, "symbol": "£" },
+    { "code": "EUR", "label": "EUR", "multiplier": 0.92, "symbol": "€" },
+    { "code": "ZAR", "label": "ZAR", "multiplier": 18.4, "symbol": "R" }
+  ],
+  "tracks": [
+    {
+      "name": "Track A · Quick wins",
+      "id": "quick-wins",
+      "packages": [
+        { "name": "Revit Family Starter", "description": "3 parametric families, type catalogs, material parameters, clean 2D/3D representation", "low": 250, "high": 450, "unit": "project", "turnaround": "3–5 working days", "category": "Revit/BIM", "anchor": "revit-bim", "status": "Published" },
+        { "name": "Revit Family Range", "description": "10 QA'd families, documented, with nested components and type catalogs", "low": 800, "high": 1500, "unit": "project", "turnaround": "10–15 working days", "category": "Revit/BIM", "status": "Published" },
+        { "name": "AR-Ready Pack", "description": "10 models with materials, optimized GLB + USDZ, AR link/QR", "low": 450, "high": 800, "unit": "10 models", "turnaround": "5–7 working days", "category": "AR models", "anchor": "ar-models", "status": "Published" },
+        { "name": "Catalog Scale-up", "description": "30+ models, batch pipeline and volume discount", "low": 40, "high": 55, "unit": "per model, approx.", "turnaround": "First 30 in 3–4 weeks; +1 week per extra 10", "category": "AR models", "status": "Published" },
+        { "name": "Shop Drawing Set", "description": "Plans, elevations, sections, hardware schedule, cut list and title block", "low": 120, "high": 300, "unit": "per unit", "turnaround": "2–4 working days per unit; 5+ units about 2 weeks", "category": "Shop drawings", "anchor": "shop-drawings", "status": "Published" },
+        { "name": "Drafting support", "description": "Revit/AutoCAD documentation and joinery details", "low": 25, "high": 40, "unit": "per hour", "turnaround": "Reply within 24 hrs; small tasks 1–3 working days", "category": "Shop drawings", "status": "Published" }
+      ]
+    },
+    {
+      "name": "Track B · Premium",
+      "id": "premium",
+      "packages": [
+        { "name": "Configurator Starter", "description": "One product line, options, pricing logic, AR and 2 revision rounds", "low": 1800, "high": 3500, "unit": "project", "turnaround": "4–6 weeks", "category": "Configurators", "anchor": "configurators", "status": "Published" },
+        { "name": "Configurator Pro", "description": "Multi-product, Shopify integration, PDF quote + cut-list export and device testing", "low": 4500, "high": 10000, "unit": "project+", "turnaround": "8–12 weeks, milestone-based", "category": "Configurators", "status": "Published" },
+        { "name": "Retainer", "description": "New products, seasonal options, updates and maintenance", "low": 300, "high": 800, "unit": "per month", "turnaround": "Reply within 48 hrs; updates 3–5 working days", "category": "Configurators", "status": "Published" }
+      ]
+    }
+  ],
+  "termsNote": "Prices are indicative; every quote is confirmed in writing.",
+  "commercialTerms": [
+    "Turnaround begins after deposit and receipt of a complete brief.",
+    "Every enquiry is acknowledged within 24 hours.",
+    "Two revision rounds are included. Revision vs. new scope is defined in every quote; extra rounds are billed hourly.",
+    "Under $500: 100% upfront or platform escrow. Larger projects: 50/50. Configurator Pro: 40/30/30 by milestone."
+  ]
+}

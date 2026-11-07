@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "dekara-configurator",
+      "slug": "dekara-designs-configurator",
+      "title": "Dekara Designs finish configurator",
+      "category": "Configurators",
+      "description": "A concept product configurator showing finish selection, live pricing, dimensions and a clear path from product image to interactive 3D.",
+      "href": "work/dekara-designs-configurator/",
+      "image": "assets/renders/dekara-pedestal-hero.svg",
+      "status": "Published",
+      "concept": true,
+      "anonymize": false,
+      "tags": ["Configurators", "AR models"]
+    },
+    {
+      "id": "custom-studio",
+      "slug": "dekara-custom-studio",
+      "title": "Dekara Custom Studio",
+      "category": "Configurators",
+      "description": "A modular furniture builder concept informed by the existing Dekara Designs demo.",
+      "href": "work/dekara-custom-studio/",
+      "demoHref": "../custom-studio.html",
+      "image": "assets/renders/studio-modules.svg",
+      "status": "Published",
+      "concept": true,
+      "anonymize": false,
+      "tags": ["Configurators"]
+    },
+    {
+      "id": "bim-family",
+      "slug": "revit-furniture-family-set",
+      "title": "Revit furniture family set",
+      "category": "Revit/BIM",
+      "description": "A sample scope for parametric furniture families, type catalogs and clean 2D/3D representation.",
+      "href": "work/revit-furniture-family-set/",
+      "image": "assets/renders/revit-family.svg",
+      "status": "Published",
+      "concept": true,
+      "anonymize": false,
+      "tags": ["Revit/BIM"]
+    },
+    {
+      "id": "shop-drawings",
+      "slug": "joinery-shop-drawing-set",
+      "title": "Joinery shop drawing set",
+      "category": "Shop drawings",
+      "description": "A sample drawing set scope with plans, elevations, hardware schedule and cut list.",
+      "href": "work/joinery-shop-drawing-set/",
+      "image": "assets/renders/shop-drawing.svg",
+      "status": "Published",
+      "concept": true,
+      "anonymize": false,
+      "tags": ["Shop drawings"]
+    },
+    {
+      "id": "ar-pack",
+      "slug": "ar-ready-model-pack",
+      "title": "AR-ready model pack",
+      "category": "AR models",
+      "description": "A sample delivery scope for compact web models and mobile AR handoff.",
+      "href": "work/ar-ready-model-pack/",
+      "image": "assets/renders/ar-model.svg",
+      "status": "Published",
+      "concept": true,
+      "anonymize": false,
+      "tags": ["AR models"]
+    }
+  ]
+}

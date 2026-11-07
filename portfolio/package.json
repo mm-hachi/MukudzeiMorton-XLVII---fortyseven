@@ -1,0 +1,17 @@
+{
+  "name": "dekara-portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "npm run build && node scripts/check.mjs && node scripts/check-leaks.mjs",
+    "check:leaks": "node scripts/check-leaks.mjs",
+    "dev": "node scripts/serve.mjs"
+  },
+  "dependencies": {
+    "three": "0.160.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.5"
+  }
+}

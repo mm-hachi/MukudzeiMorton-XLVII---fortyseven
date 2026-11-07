@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "items": [
+    { "label": "Services", "href": "services/", "status": "Published" },
+    { "label": "Work", "href": "work/", "status": "Published" },
+    { "label": "Configurator Lab", "href": "lab/", "status": "Published" },
+    { "label": "Resources", "href": "resources/", "status": "Published" },
+    { "label": "Process", "href": "process/", "status": "Published" },
+    { "label": "About", "href": "about/", "status": "Published" }
+  ],
+  "cta": { "label": "Start a project", "href": "contact/", "status": "Published" }
+}

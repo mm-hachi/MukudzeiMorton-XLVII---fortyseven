@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 720" role="img" aria-label="Original Dekara Pedestal concept illustration"><defs><radialGradient id="bg"><stop stop-color="#fff"/><stop offset="1" stop-color="#efeee9"/></radialGradient><filter id="shadow" x="-40%" y="-40%" width="180%" height="200%"><feGaussianBlur stdDeviation="17"/></filter></defs><rect width="800" height="720" fill="url(#bg)"/><ellipse cx="400" cy="600" rx="184" ry="28" fill="#222" opacity=".12" filter="url(#shadow)"/><g transform="translate(0 0)"><g stroke="#383832" stroke-opacity=".16" stroke-width="2">
+    <path d="M288 284h224l-10 205H298z" fill="#9b6e5d"/>
+    <path d="M298 489h204l-17 28H315z" fill="#000" opacity=".08"/>
+    <path d="M303 517l-10 84h17l19-84m128 0 18 84h17l-10-84" fill="#73513b"/>
+    <path d="M288 284l28-28h221l-25 28z" fill="#73513b"/>
+    <path d="M512 284l25-28v205l-25 28z" fill="#000" opacity=".08"/>
+    <path d="M350 351h100" stroke="#292a29" stroke-width="12" stroke-linecap="round"/>
+    <circle cx="351" cy="351" r="4" fill="#292a29" stroke="none"/>
+    <circle cx="449" cy="351" r="4" fill="#292a29" stroke="none"/>
+  </g></g><path d="M185 625h430" stroke="#b6b4ad" stroke-width="1"/><path d="M185 619v12m430-12v12" stroke="#b6b4ad"/><text x="400" y="654" text-anchor="middle" fill="#78786f" font-family="Arial,sans-serif" font-size="12" letter-spacing="3">DEKARA · CONCEPT STUDY</text></svg>

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "status": "Published",
+  "title": "A clear brief. A useful handover.",
+  "intro": "A small, defined first step keeps the scope, files and decisions visible.",
+  "steps": [
+    { "title": "01 · Send the brief", "text": "Include the product list, CAD or photos, reference links, finish options, target platforms and deadline." },
+    { "title": "02 · Confirm scope", "text": "A written quote defines deliverables, revision rounds, file formats, milestones and what counts as new scope." },
+    { "title": "03 · Review checkpoints", "text": "Review the model, materials and data before the final exports are prepared." },
+    { "title": "04 · Handover", "text": "Receive named, organized files and a concise note on how to use them." }
+  ],
+  "terms": [
+    "Turnaround counts working days from deposit and a complete brief.",
+    "Every enquiry is acknowledged within 24 hours.",
+    "Written quotes are sent within 24 hours for standard work and within 48 hours for configurators.",
+    "Two revision rounds are included; extra rounds are billed hourly.",
+    "Packages under $500 are paid 100% upfront or through platform escrow. Larger projects use 50/50 payments; Configurator Pro uses 40/30/30 by milestone."
+  ]
+}

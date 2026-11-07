@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "default": "system",
+  "accent": "#8f7356",
+  "light": {
+    "background": "#f8f7f4",
+    "surface": "#ffffff",
+    "ink": "#191a18",
+    "muted": "#666860",
+    "line": "#deddd7"
+  },
+  "dark": {
+    "background": "#171816",
+    "surface": "#222320",
+    "ink": "#f1f0eb",
+    "muted": "#b9b8b0",
+    "line": "#41413b"
+  }
+}
