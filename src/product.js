@@ -3,7 +3,6 @@ import { viewer } from './viewer.js';
 import * as Basket from './basket.js';
 import { fit, openAR } from './ar.js';
 import { initReviews } from './reviews.js';
-import { setRangeValue } from './range.js';
 const $=id=>document.getElementById(id),esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const p=PRODUCTS.find(x=>x.id===new URLSearchParams(location.search).get('id'))||PRODUCTS[0];
 if(!p)location.replace('shop.html');else{
@@ -51,29 +50,16 @@ dimensionsToggle.onclick=()=>{
 };
 const v=viewer($('p-canvas'),p.id,{orbit:true,capture:true});
 v.onFrame(updateDimensions);
-const lightingControls={
- brightness:$('p-light-brightness'),warmth:$('p-light-warmth'),environment:$('p-light-environment')
-};
-const syncLightingInput=(key,value)=>{
- const range=lightingControls[key],exact=$(`p-light-${key}-exact`);
- if(!Number.isFinite(value))return;
- setRangeValue(range,value);exact.value=String(value);updateLighting();
-};
-const updateLighting=()=>{
- const values=Object.fromEntries(Object.entries(lightingControls).map(([key,input])=>[key,Number(input.value)]));
- $('p-light-brightness-value').textContent=`${values.brightness}%`;
- $('p-light-warmth-value').textContent=values.warmth===0?'Neutral':`${values.warmth>0?'Warm':'Cool'} ${Math.abs(values.warmth)}%`;
- $('p-light-environment-value').textContent=`${values.environment}%`;
- v.setLighting({brightness:values.brightness/100,warmth:values.warmth/100,environment:values.environment/100});
-};
-Object.entries(lightingControls).forEach(([key,range])=>{
- range.addEventListener('input',()=>{ $(`p-light-${key}-exact`).value=range.value;updateLighting() });
- const exact=$(`p-light-${key}-exact`);
- exact.addEventListener('input',()=>syncLightingInput(key,exact.valueAsNumber));
- exact.addEventListener('change',()=>{if(!Number.isFinite(exact.valueAsNumber))exact.value=range.value});
+const toggleableButton=$('p-toggleable');let propsHidden=false;
+v.onToggleablePartsChange(available=>{
+ toggleableButton.hidden=!available;toggleableButton.disabled=!available;
+ if(!available){propsHidden=false;toggleableButton.textContent='Hide props';toggleableButton.setAttribute('aria-pressed','false')}
 });
-updateLighting();
-$('p-light-reset').onclick=()=>{Object.entries({brightness:100,warmth:0,environment:100}).forEach(([key,value])=>syncLightingInput(key,value))};
+toggleableButton.onclick=()=>{
+ propsHidden=!propsHidden;v.setToggleableVisible(!propsHidden);
+ toggleableButton.textContent=propsHidden?'Show props':'Hide props';
+ toggleableButton.setAttribute('aria-pressed',String(propsHidden));
+};
 const opts=(p.fabrics&&p.fabrics.length)?p.fabrics:[['Oyster','#d4cabb','oyster',null,'']];
 let fabric=opts.find(m=>m[2]===p.defaults?.fabric)||opts[0],cur,override=null;
 const ftypes=p.finishTypes||[{id:'frame',name:'Frame',target:'frame',finishes:FINISHES},{id:'fabric',name:'Fabric',target:'fabric',materialType:'Fabric',finishes:opts}];
@@ -86,6 +72,13 @@ const selectFabric=id=>{const f=opts.find(z=>z[2]===id);if(!f)return;fabric=f;ov
 // Render finish types
 const finBox=$('p-finishes');
 ftypes.forEach(ft=>{
+ if(ft.finishes.length===1){
+  const material=ft.finishes[0];
+  curFinishes[ft.id]=material;
+  if(ft.id==='fabric'){fabric=material;override=null;paint()}
+  v.setFinish(ft.target||ft.name,material,getMapping(p.id,material[2],ft.id));
+  return;
+ }
  const label=document.createElement('label'),value=document.createElement('span');
  label.append(`${ft.name} finish · `,value);
  value.textContent=curFinishes[ft.id]?.[0]||'';
@@ -137,7 +130,7 @@ gallery.querySelectorAll('[data-slot]').forEach(slot=>{
 lightbox.querySelector('.gallery-lightbox-close').onclick=()=>lightbox.close();
 lightbox.addEventListener('click',e=>{if(e.target===lightbox)lightbox.close()});
 $('p-wish').dataset.wish=p.id;$('p-cmp').dataset.cmp=p.id;
-$('p-ar').onclick=()=>{const o=fit(v.getModel().object,cur.d);openAR(o,p.name,'dekara-'+p.id)};
+$('p-ar').onclick=()=>{const o=fit(v.getModel().object,cur.d,{preserveScale:propsHidden});openAR(o,p.name,'dekara-'+p.id)};
 initReviews(p.id);
 const mappingOptions=FINISH_TYPES.flatMap(ft=>assignedFinishesFor(p.id,ft.id).map(material=>({
  key:mappingId(material[2],ft.id),label:`${ft.name}: ${material[0]}`,kind:'finish',material,ft

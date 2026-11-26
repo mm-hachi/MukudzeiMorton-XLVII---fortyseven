@@ -106,6 +106,7 @@ Add references to them under `"documents"` in `data/site.json`.
 2. **Pieces**:
    - Set category, subcategory, price, description, dimensions, and model.
    - Select which fabrics and which finishes are offered for each piece.
+   - For a loaded model part with exactly one assigned finish material, enable **Allow customers to hide/show** to add the product-page prop control. Hidden parts are also omitted from AR and its GLB/USDZ downloads.
 3. **Studio Collections**:
    - Create modular collections with piece dimensions and pricing.
    - Upload collection preview images.

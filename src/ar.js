@@ -1,12 +1,14 @@
 import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { USDZExporter } from 'three/addons/exporters/USDZExporter.js';
-// Clone a model, size it to real-world centimetres (w,d,h) and stand it on y=0, centred. Returns null if empty.
-export function fit(obj,cm){
+// Clone visible model content, optionally fit it to real-world centimetres, and stand it on y=0, centred.
+export function fit(obj,cm,{preserveScale=false}={}){
  const ud=obj.userData;obj.userData={};const c=obj.clone(true);obj.userData=ud;c.scale.set(1,1,1);c.position.set(0,0,0);c.rotation.set(0,0,0);
+ const pruneInvisible=parent=>{parent.children.slice().forEach(child=>{if(!child.visible)parent.remove(child);else pruneInvisible(child)})};
+ pruneInvisible(c);
  const w=new THREE.Group(),out=new THREE.Group();w.add(c);out.add(w);out.updateMatrixWorld(true);
  let b=new THREE.Box3().setFromObject(out);if(b.isEmpty())return null;const z=b.getSize(new THREE.Vector3());
- if(cm)w.scale.set(cm[0]/100/z.x,cm[2]/100/z.y,cm[1]/100/z.z);
+ if(cm&&!preserveScale)w.scale.set(cm[0]/100/z.x,cm[2]/100/z.y,cm[1]/100/z.z);
  out.updateMatrixWorld(true);b=new THREE.Box3().setFromObject(out);const k=b.getCenter(new THREE.Vector3());w.position.set(-k.x,-b.min.y,-k.z);
  out.traverse(o=>{o.userData={}});return out;
 }

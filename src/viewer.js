@@ -17,8 +17,28 @@ export function viewer(canvas,id,{orbit=false,spin=.35,scroll=false,fullscreen=t
  const floor=new THREE.Mesh(new THREE.CircleGeometry(5,64),new THREE.ShadowMaterial({opacity:.22}));floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;sc.add(floor);
  const ring=new THREE.Mesh(new THREE.RingGeometry(2.3,2.33,128),new THREE.MeshBasicMaterial({color:0x9c7a4d,transparent:true,opacity:.35,side:2}));ring.rotation.x=-Math.PI/2;ring.position.y=.005;sc.add(ring);
  const ctl=new OrbitControls(cam,canvas);ctl.target.copy(look);ctl.enableDamping=true;ctl.enablePan=view.pan;ctl.enableRotate=orbit;ctl.minDistance=view.minZoom;ctl.maxDistance=view.maxZoom;ctl.maxPolarAngle=Math.PI*.49;
- let obj,grow=0,colour,glow=1,dim=[1,1,1],dead=false,fab=null,capturing=false;
- const frameListeners=new Set();
+ let obj,grow=0,colour,glow=1,dim=[1,1,1],dead=false,fab=null,capturing=false,toggleableVisible=true,toggleableMeshes=[],toggleableScene=null,toggleableBasePosition=null,toggleableCenter=null,toggleableRemainingMeshes=[];
+ const frameListeners=new Set(),toggleableListeners=new Set();
+ const notifyToggleableParts=()=>toggleableListeners.forEach(listener=>listener(toggleableMeshes.length>0));
+ const boundsInScene=(meshes,root)=>{
+  root.updateWorldMatrix(true,true);
+  const inverse=new THREE.Matrix4().copy(root.matrixWorld).invert(),bounds=new THREE.Box3();
+  meshes.forEach(mesh=>{
+   const geometry=mesh.geometry;if(!geometry.boundingBox)geometry.computeBoundingBox();
+   if(geometry.boundingBox)bounds.union(new THREE.Box3().copy(geometry.boundingBox).applyMatrix4(new THREE.Matrix4().multiplyMatrices(inverse,mesh.matrixWorld)));
+  });
+  return bounds;
+ };
+ const setToggleableVisible=visible=>{
+  toggleableVisible=visible;toggleableMeshes.forEach(({mesh,visible:initial})=>{mesh.visible=visible&&initial});
+  if(!toggleableScene||!toggleableBasePosition)return;
+  toggleableScene.position.copy(toggleableBasePosition);
+  if(!visible&&toggleableCenter&&toggleableRemainingMeshes.length){
+   const bounds=boundsInScene(toggleableRemainingMeshes,toggleableScene);
+   if(!bounds.isEmpty())toggleableScene.position.add(toggleableCenter.clone().sub(bounds.getCenter(new THREE.Vector3())));
+  }
+ };
+ const onToggleablePartsChange=listener=>{toggleableListeners.add(listener);listener(toggleableMeshes.length>0);return ()=>toggleableListeners.delete(listener)};
  const lightDefaults={exposure:r.toneMappingExposure,key:key.intensity,rim:rim.intensity,back:back.intensity,
   keyColor:key.color.clone(),rimColor:rim.color.clone(),backColor:back.color.clone()};
  const envMaterials=new Map();let lighting={brightness:1,warmth:0,environment:1};
@@ -81,24 +101,27 @@ export function viewer(canvas,id,{orbit=false,spin=.35,scroll=false,fullscreen=t
  const setFinish=(tgt,mat,m=DEFMAP)=>{const k=(tgt||'frame').toLowerCase().trim();curFinishes[k]={mat,m};applyFinishes()};
  const setFrame=h=>{setFinish('frame',h)};
  const setGlow=v=>{glow=v;obj.userData.glows.forEach(m=>m.emissiveIntensity=v*3);rim.intensity=12*v*BK};
- function set(n){fab=null;orig=[];if(obj)sc.remove(obj);
+ function set(n){fab=null;orig=[];toggleableMeshes=[];toggleableVisible=true;toggleableScene=null;toggleableBasePosition=null;toggleableCenter=null;toggleableRemainingMeshes=[];notifyToggleableParts();if(obj)sc.remove(obj);
   const prod=PRODUCTS.find(p=>p.id===n),fabrics=prod?.fabrics||[],firstFabric=fabrics.find(f=>f[2]===prod?.defaults?.fabric)||fabrics[0];colour=firstFabric?.[1]||'#d4cabb';const u=Store.url('model:'+n)||Store.DATA.models?.[n];
   if(!u)obj=build(n,colour);else{obj=new THREE.Group();obj.userData={tints:[],glows:[],frames:[],finMap:{}};
    loadGLTF(u).then(gl=>{const s=gl.scene,b=new THREE.Box3().setFromObject(s),z=b.getSize(new THREE.Vector3()),c=b.getCenter(new THREE.Vector3()),k=2.6/Math.max(z.x,z.y,z.z);
     s.scale.setScalar(k);s.position.set(-c.x*k,-b.min.y*k,-c.z*k);
-    const nm=[],al=[],fr=[],finMap={};
+    const nm=[],al=[],fr=[],finMap={},toggleableTargets=new Set(prod?.toggleableTargets||[]),parts=[],allMeshes=[];
     const ftypes=Store.finishTypes?Store.finishTypes():[{id:'frame',name:'Frame',target:'frame'}];
     const targets=new Set(ftypes.map(t=>(t.target||t.name||'').toLowerCase().trim()));targets.add('frame');
-    s.traverse(o=>{if(o.isMesh){o.castShadow=o.receiveShadow=true;[].concat(o.material).forEach(m=>{
+    const isVisible=o=>{for(let node=o;node&&node!==s;node=node.parent)if(!node.visible)return false;return true};
+    s.traverse(o=>{if(o.isMesh){o.castShadow=o.receiveShadow=true;const materials=[].concat(o.material),meshTargets=new Set(materials.map(m=>(m.name||'').toLowerCase().trim()));if(isVisible(o)){allMeshes.push(o);if([...toggleableTargets].some(target=>meshTargets.has(target)))parts.push({mesh:o,visible:o.visible})}materials.forEach(m=>{
      const mn=(m.name||'').toLowerCase().trim();let matched=false;
      targets.forEach(tgt=>{if(tgt&&mn===tgt){(finMap[tgt]??=[]).push(m);if(tgt==='frame')fr.push(m);matched=true}});
      if(matched)return;
      if(!(m.transparent&&m.opacity<1)){al.push(m);if(mn==='tint')nm.push(m)}
     })}});
     obj.userData.tints.push(...(nm.length?nm:al));obj.userData.frames.push(...fr);obj.userData.finMap=finMap;
-    obj.add(s);snap();applyFinishes();applyFab();updateEnvironment();
+    obj.add(s);toggleableMeshes=parts;toggleableScene=s;toggleableBasePosition=s.position.clone();const toggleableSet=new Set(parts.map(part=>part.mesh));toggleableRemainingMeshes=allMeshes.filter(mesh=>!toggleableSet.has(mesh));
+    const fullBounds=boundsInScene(allMeshes,s);toggleableCenter=fullBounds.isEmpty()?null:fullBounds.getCenter(new THREE.Vector3());
+    setToggleableVisible(toggleableVisible);notifyToggleableParts();snap();applyFinishes();applyFab();updateEnvironment();
     if(firstFabric)setFabric(firstFabric,getMapping(n,firstFabric[2],'fabric'));
-   }).catch(()=>obj.add(build(n,colour)))}
+   }).catch(error=>{console.error(`Could not load the product model for ${n}.`,error);obj.add(build(n,colour));toggleableMeshes=[];toggleableScene=null;toggleableBasePosition=null;toggleableCenter=null;toggleableRemainingMeshes=[];notifyToggleableParts()})}
   sc.add(obj);grow=0;setGlow(glow);snap();applyFinishes();applyFab();
   Object.keys(curFinishes).forEach(k=>delete curFinishes[k]);
   prod?.finishTypes?.forEach(ft=>{const material=ft.finishes.find(m=>m[2]===prod.defaults?.[ft.id])||ft.finishes[0];if(material)setFinish(ft.target||ft.name,material,getMapping(n,material[2],ft.id))});
@@ -149,5 +172,5 @@ export function viewer(canvas,id,{orbit=false,spin=.35,scroll=false,fullscreen=t
   photo=document.createElement('button');photo.type='button';photo.className='viewport-photo-button';photo.textContent='Take photo';photo.setAttribute('aria-label','Take a clean photo of this view');stage.append(photo);
   photo.addEventListener('click',()=>capturePhoto(photo));
  }
- return {destroy(){dead=true;ro.disconnect();vio.disconnect();removeEventListener('pointermove',mv);if(fullChange)document.removeEventListener('fullscreenchange',fullChange);full?.remove();photo?.remove();ctl.dispose();r.dispose();r.forceContextLoss&&r.forceContextLoss()},getModel:()=>({object:obj,dim}),projectDimensions,onFrame(listener){frameListeners.add(listener);return ()=>frameListeners.delete(listener)},setId:set,setColour:tint,setFabric,setFrame,setFinish,setLighting,setGlow,setDims:(a,b,c)=>{dim=[a,b,c]}};
+ return {destroy(){dead=true;ro.disconnect();vio.disconnect();removeEventListener('pointermove',mv);if(fullChange)document.removeEventListener('fullscreenchange',fullChange);full?.remove();photo?.remove();ctl.dispose();r.dispose();r.forceContextLoss&&r.forceContextLoss()},getModel:()=>({object:obj,dim}),projectDimensions,onFrame(listener){frameListeners.add(listener);return ()=>frameListeners.delete(listener)},onToggleablePartsChange,setToggleableVisible,setId:set,setColour:tint,setFabric,setFrame,setFinish,setLighting,setGlow,setDims:(a,b,c)=>{dim=[a,b,c]}};
 }

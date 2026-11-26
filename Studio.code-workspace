@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../Desktop/XLVII/timbur/timbur_2D_configurator"
+		}
+	],
+	"settings": {
+		"liveServer.settings.ignoreFiles": [
+			"**/data/site.json",
+			"**/models/**",
+			"**/swatches/**",
+			"**/media/**"
+		],
+		"liveServer.settings.multiRootWorkspaceName": "Studio"
+	}
+}

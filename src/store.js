@@ -62,6 +62,8 @@ export const delMapping=(pid,fid)=>{if(cfg.mapping?.[pid])delete cfg.mapping[pid
 export const setPieceFabrics=(pid,list)=>{(cfg.pieceFabrics??={})[pid]=list;save()};
 export const setPieceFinishAvailability=(pid,ftid,available)=>{(((cfg.pieceFinishAvailability??={})[pid]??={})[ftid]=available);save()};
 export const setPieceFinishes=(pid,ftid,list)=>{(((cfg.pieceFinishes??={})[pid]??={})[ftid]=[...list]);save()};
+export const pieceToggleable=(pid,ftid)=>cfg.pieceToggleable?.[pid]?.[ftid]??DATA.pieceToggleable?.[pid]?.[ftid]??false;
+export const setPieceToggleable=(pid,ftid,toggleable)=>{(((cfg.pieceToggleable??={})[pid]??={})[ftid]=toggleable);save()};
 export const setPieceDefault=(pid,ftid,materialId)=>{(((cfg.pieceDefaults??={})[pid]??={})[ftid]=materialId);save()};
 export const materialTypes=()=>[...(cfg.materialTypes??DATA.materialTypes??DEFAULT_MATERIAL_TYPES)].map(type=>typeof type==='string'?{name:type,kind:'finish'}:{...type});
 export const addMaterialType=type=>{const types=materialTypes();if(types.some(item=>item.name.toLowerCase()===type.name.toLowerCase()))return false;types.push(type);cfg.materialTypes=types;save();return true};

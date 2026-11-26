@@ -1,6 +1,6 @@
 import * as Store from './store.js';
 import { PRODUCTS, CATS, FABRIC_LIST, MATERIAL_LIST, FABRICS, MATERIALS } from './products.js';
-import { measureGLB } from './loader.js';
+import { inspectGLTF, measureGLB } from './loader.js';
 import { setRangeValue } from './range.js';
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const hash=s=>crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(b=>[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''));
@@ -41,7 +41,7 @@ const addHtml=()=>{
  const defSelect=(ftid,options,selected)=>`<label>Default ${ftid==='fabric'?'fabric':`${esc(fts.find(ft=>ft.id===ftid)?.name||'finish')} finish`}<select data-npdefault="${esc(ftid)}">${options.map(m=>`<option value="${esc(m[2])}"${m[2]===selected?' selected':''}>${esc(m[0])}</option>`).join('')}</select></label>`;
  return `<h4>Add a piece to the shop</h4><p class="note">Upload a GLB (Draco and Meshopt compression are supported). Dimensions fill in from the model and can be edited. Choose which finish types customers can customize, then select each type's default material.</p>
  <label>Name<input id="np-name"></label><label>Category<select id="np-cat">${CATS.map(c=>`<option>${c}</option>`).join('')}</select></label><label>Subcategory<input id="np-sub"></label><label>Tagline<input id="np-tag"></label><label>Price (ZAR)<input id="np-price" type="number" min="0"></label><label>Materials<input id="np-mat"></label><label>Description<textarea id="np-desc" rows="3"></textarea></label>
- <label>3D model (.glb)<input type="file" id="np-file" accept=".glb,.gltf"></label>
+ <label>3D model (.glb)<input type="file" id="np-file" accept=".glb,.gltf"></label><div class="ar" id="np-toggleable-options" hidden></div>
  ${fts.map(ft=>{const defaultList=defaultOptions(ft.id,undefined),selected=defaultList[0]?.[2];return `<div class="ar"><b>${esc(ft.name)} customization</b>${chk2(`data-npoptions="${ft.id}"`,'true',`Offer ${ft.name.toLowerCase()} as a customizable option`,true)}${defSelect(ft.id,defaultList,selected)}</div>`}).join('')}
  <div class="ar"><b>Model dimensions (cm)</b><label>Width<input id="np-w" type="number" min="1" step="1"></label><label>Depth<input id="np-d" type="number" min="1" step="1"></label><label>Height<input id="np-h" type="number" min="1" step="1"></label><label style="display:flex;gap:.5rem;align-items:center"><input id="np-dims-lock" type="checkbox" style="width:auto"> Lock dimensions</label></div>
  <div class="acts"><button data-act="addprod">Add to shop</button></div>`;
@@ -85,6 +85,16 @@ const pieceFinishOptions=(pid,ftid,defaults)=>{
  const selected=Store.cfg.pieceFinishes?.[pid]?.[ftid]??Store.DATA.pieceFinishes?.[pid]?.[ftid]??options.map(m=>m[2]);
  return {options,selected,defaults:options.filter(m=>selected.includes(m[2])).length?options.filter(m=>selected.includes(m[2])):options};
 };
+const toggleableFinishTypes=(materialNames,pid)=>{
+ const available=new Set(materialNames);
+ return Store.finishTypes().filter(ft=>{
+  const target=(ft.target||ft.name||'').toLowerCase().trim();
+  const options=assignedFinishes(ft.id);
+  const selected=pid?(Store.cfg.pieceFinishes?.[pid]?.[ft.id]??Store.DATA.pieceFinishes?.[pid]?.[ft.id]??options.map(m=>m[2])):options.map(m=>m[2]);
+  return target&&available.has(target)&&(!pid||pieceTypeAvailable(pid,ft.id))&&options.filter(m=>selected.includes(m[2])).length===1;
+ });
+};
+const toggleableOptionsHtml=(types,attribute,isChecked,valuePrefix='')=>types.length?`<b>Hide/show props</b><small>These single-material model parts can be hidden on the product page and in AR.</small>${types.map(ft=>chk2(`${attribute}="${esc(valuePrefix+ft.id)}"`,'true',`Allow customers to hide/show ${ft.name.toLowerCase()}`,isChecked(ft))).join('')}`:'';
 const safePart=value=>{const s=String(value).replace(/[^a-z0-9_-]/gi,'-').replace(/^-+|-+$/g,'');if(!s)throw new Error('An uploaded file has an invalid ID for its repository path.');return s};
 const fileExt=(name,type)=>{const match=/\.([a-z0-9]{2,8})$/i.exec(name||'');if(match)return match[1].toLowerCase();
  return ({'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif','video/mp4':'mp4','video/webm':'webm','model/gltf-binary':'glb','model/gltf+json':'gltf'}[type]||'bin')};
@@ -223,10 +233,41 @@ function openPanel(){
  ${document.getElementById('p-canvas')?'<h4>Mapping</h4><div id="map-body"></div>':''}
  ${pubHtml()}${siteHtml()}${shopHtml()}${studioHtml()}${fabHtml()}${addHtml()}${collHtml()}<h4>Pieces</h4><div class="acts"><button data-act="restoredef">Restore deleted default pieces</button></div>${PRODUCTS.map(x=>`<details><summary>${esc(x.name)}</summary>${fld(x.id,'name','Name',x.name)}<label>Category<select data-pid="${x.id}" data-k="cat">${CATS.map(c=>`<option${c===x.cat?' selected':''}>${c}</option>`).join('')}</select></label>${fld(x.id,'sub','Subcategory',x.sub)}${fld(x.id,'tag','Tagline',x.tag)}${fld(x.id,'price','Price (ZAR)',x.price,'number')}${fld(x.id,'desc','Description',x.desc,'area')}
  <div class="ar"><b>Model dimensions (cm)</b>${[['Width',0],['Depth',1],['Height',2]].map(([label,index])=>`<label>${label}<input type="number" min="1" step="1" data-pid="${x.id}" data-dim="${index}" value="${x.dims[index]}" ${x.dimsLocked?'disabled':''}></label>`).join('')}<label style="display:flex;gap:.5rem;align-items:center"><input type="checkbox" data-dims-lock="${x.id}" ${x.dimsLocked?'checked':''} style="width:auto"> Lock dimensions</label></div>
- <button type="button" data-edit-materials="${esc(x.id)}" aria-expanded="false">Edit materials</button><div class="piece-material-editor" data-piece-material-editor="${esc(x.id)}" hidden>${Store.finishTypes().map(ft=>{const {options,selected,defaults}=pieceFinishOptions(x.id,ft.id,x.defaults);return `<div class="ar"><b>${esc(ft.name)} customization</b>${chk2(`data-pieceavailability="${x.id}|${ft.id}"`,'true',`Offer ${ft.name.toLowerCase()} as a customizable option`,pieceTypeAvailable(x.id,ft.id))}<div><b>Available ${ft.id==='fabric'?'fabrics':`${esc(ft.name.toLowerCase())} materials`}</b>${options.map(m=>chk2(`data-pfin="${esc(x.id)}|${esc(ft.id)}"`,m[2],m[0],selected.includes(m[2]))).join('')||'<small>No materials assigned globally. Assign materials in the Materials library first.</small>'}</div>${defaultMaterial(x.id,ft.id,defaults,x.defaults)}${ft.id==='fabric'?'<a href="product.html?id='+encodeURIComponent(x.id)+'" style="border-bottom:1px solid var(--line);justify-self:start">Open piece page to edit fabric texture mapping</a>':''}</div>`}).join('')}</div>
+ <button type="button" data-edit-materials="${esc(x.id)}" aria-expanded="false">Edit materials</button><div class="piece-material-editor" data-piece-material-editor="${esc(x.id)}" hidden>${Store.finishTypes().map(ft=>{const {options,selected,defaults}=pieceFinishOptions(x.id,ft.id,x.defaults);return `<div class="ar" data-piece-finish="${esc(x.id)}|${esc(ft.id)}"><b>${esc(ft.name)} customization</b>${chk2(`data-pieceavailability="${x.id}|${ft.id}"`,'true',`Offer ${ft.name.toLowerCase()} as a customizable option`,pieceTypeAvailable(x.id,ft.id))}<div><b>Available ${ft.id==='fabric'?'fabrics':`${esc(ft.name.toLowerCase())} materials`}</b>${options.map(m=>chk2(`data-pfin="${esc(x.id)}|${esc(ft.id)}"`,m[2],m[0],selected.includes(m[2]))).join('')||'<small>No materials assigned globally. Assign materials in the Materials library first.</small>'}</div><div class="piece-toggleable-option" data-piece-toggleable="${esc(x.id)}|${esc(ft.id)}" hidden></div>${defaultMaterial(x.id,ft.id,defaults,x.defaults)}${ft.id==='fabric'?'<a href="product.html?id='+encodeURIComponent(x.id)+'" style="border-bottom:1px solid var(--line);justify-self:start">Open piece page to edit fabric texture mapping</a>':''}</div>`}).join('')}</div>
  ${row('3D model (.glb / .gltf)','model:'+x.id,'.glb,.gltf,model/gltf-binary')}${[1,2,3].map(n=>row('Gallery photo or video '+n,`gallery:${x.id}:${n}`,'image/*,video/*')).join('')}<div class="acts"><button data-delprod="${x.id}">Delete this piece</button></div></details>`).join('')}
  </div><div class="acts" id="adm-final"><button data-act="apply">Apply changes</button><button data-act="export">Export text</button><button data-act="import">Import text</button><button data-act="reset">Reset everything</button><button data-act="lock">Lock</button></div>`;
  document.body.append(p);requestAnimationFrame(()=>p.classList.add('open'));
+ const pieceModelMaterials=new Map();
+ const renderPieceToggleables=(pid,materialNames)=>{
+  Store.finishTypes().forEach(ft=>{
+   const key=`${pid}|${ft.id}`,container=[...p.querySelectorAll('[data-piece-toggleable]')].find(item=>item.dataset.pieceToggleable===key);
+   if(!container)return;
+   const section=container.closest('[data-piece-finish]'),offer=[...section.querySelectorAll('[data-pieceavailability]')].find(input=>input.dataset.pieceavailability===key),checked=[...section.querySelectorAll('[data-pfin]')].filter(input=>input.dataset.pfin===key&&input.checked);
+   const eligible=offer?.checked&&checked.length===1&&toggleableFinishTypes(materialNames,pid).some(item=>item.id===ft.id);
+   if(!eligible){
+    if(Store.pieceToggleable(pid,ft.id))Store.setPieceToggleable(pid,ft.id,false);
+    container.hidden=true;container.innerHTML='';return;
+   }
+   container.hidden=false;container.innerHTML=toggleableOptionsHtml([ft],'data-toggleable',()=>Store.pieceToggleable(pid,ft.id),`${pid}|`);
+  });
+ };
+ p.querySelectorAll('[data-piece-material-editor]').forEach(editor=>{
+  const details=editor.closest('details'),pid=editor.dataset.pieceMaterialEditor;
+  details.addEventListener('toggle',async()=>{
+   if(!details.open||editor.dataset.inspected)return;
+   editor.dataset.inspected='true';
+   const product=PRODUCTS.find(item=>item.id===pid),source=Store.url(`model:${pid}`)||Store.DATA.models?.[pid]||product?.model;
+   if(!source)return;
+   try{const inspection=await inspectGLTF(source),names=new Set(inspection.materialNames);pieceModelMaterials.set(pid,names);renderPieceToggleables(pid,names)}
+   catch(error){delete editor.dataset.inspected;editor.querySelector('.piece-toggleable-error')?.remove();const status=document.createElement('small');status.className='piece-toggleable-error';status.textContent='Could not inspect this model for hide/show parts.';editor.prepend(status);console.error(`Could not inspect the model for ${pid}.`,error)}
+  });
+ });
+ const npToggleableOptions=document.getElementById('np-toggleable-options');let npInspection=0;
+ const showNewProductToggleables=materialNames=>{
+  const types=toggleableFinishTypes(materialNames,null);
+  npToggleableOptions.innerHTML=toggleableOptionsHtml(types,'data-nptoggleable',()=>false);
+  npToggleableOptions.hidden=!types.length;
+ };
  // Each group of controls lives in its own collapsible "burger" section
  const scroll=p.querySelector('#adm-scroll');
  [...scroll.querySelectorAll(':scope>h4')].forEach(h=>{const d=document.createElement('details');d.className='sec';const s=document.createElement('summary');s.textContent='☰ '+h.textContent;d.append(s);
@@ -259,9 +300,13 @@ function openPanel(){
   if(t.dataset.mft){Store.setMaterialFinishTypes(t.dataset.mft,[...p.querySelectorAll(`[data-mft="${t.dataset.mft}"]`)].filter(i=>i.checked).map(i=>i.value));return}
   if(t.dataset.pfin){const [pid,ftid]=t.dataset.pfin.split('|'),selected=[...p.querySelectorAll('[data-pfin]')].filter(i=>i.dataset.pfin===t.dataset.pfin&&i.checked).map(i=>i.value);
    Store.setPieceFinishes(pid,ftid,selected);
+   if(selected.length!==1&&Store.pieceToggleable(pid,ftid))Store.setPieceToggleable(pid,ftid,false);
    const select=[...p.querySelectorAll('[data-pdefault]')].find(i=>i.dataset.pdefault===`${pid}|${ftid}`);
    if(select&&selected.length&&!selected.includes(select.value)){select.value=selected[0];Store.setPieceDefault(pid,ftid,select.value)}
+   const names=pieceModelMaterials.get(pid);
+   if(names)renderPieceToggleables(pid,names);
    return}
+  if(t.dataset.toggleable){const [pid,ftid]=t.dataset.toggleable.split('|');Store.setPieceToggleable(pid,ftid,t.checked);return}
   if(t.id==='nf-type'){
    const type=Store.materialTypes().find(item=>item.name===t.value);
    const defaults=type?.kind==='fabric'?['fabric']:['Wood','Metal'].includes(t.value)?['frame']:[];
@@ -275,7 +320,7 @@ function openPanel(){
    const [pid,ftid]=t.dataset.pdefault.split('|');Store.setPieceDefault(pid,ftid,t.value);
    return
   }
-  if(t.dataset.pieceavailability){const [pid,ftid]=t.dataset.pieceavailability.split('|');Store.setPieceFinishAvailability(pid,ftid,t.checked);return}
+  if(t.dataset.pieceavailability){const [pid,ftid]=t.dataset.pieceavailability.split('|');Store.setPieceFinishAvailability(pid,ftid,t.checked);const names=pieceModelMaterials.get(pid);if(names)renderPieceToggleables(pid,names);return}
   if(t.dataset.npoptions)return;
   if(t.dataset.stfab!==undefined){Store.setStudioFabrics([...p.querySelectorAll('[data-stfab]')].filter(i=>i.checked).map(i=>i.value));return}
   if(t.dataset.stfin){const [ftid]=t.dataset.stfin.split('|');Store.setStudioFinishes(ftid,[...p.querySelectorAll(`[data-stfin^="${ftid}|"]`)].filter(i=>i.checked).map(i=>i.value));return}
@@ -286,7 +331,11 @@ function openPanel(){
    }
    Store.setSite(t.dataset.site,t.type==='checkbox'?t.checked:t.type==='number'?Number(t.value):t.value.trim());return
   }
-  if(t.id==='np-file'&&t.files[0]){if(!document.getElementById('np-dims-lock').checked){try{const [w,d,h]=await measureGLB(t.files[0]);['np-w','np-d','np-h'].forEach((i,k)=>document.getElementById(i).value=[w,d,h][k])}catch{alert('Could not read that model. You can still enter the size manually.')}}return}
+  if(t.id==='np-file'){const version=++npInspection;npToggleableOptions.hidden=true;npToggleableOptions.innerHTML='';if(!t.files[0])return;
+   try{const inspection=await inspectGLTF(t.files[0]);if(version!==npInspection)return;
+    if(!document.getElementById('np-dims-lock').checked)['np-w','np-d','np-h'].forEach((id,index)=>document.getElementById(id).value=inspection.dimensions[index]);
+    showNewProductToggleables(inspection.materialNames);
+   }catch(error){if(version!==npInspection)return;console.error('Could not inspect the selected product model.',error);alert('Could not read that model. You can still enter the size manually.')}return}
   if(t.dataset.cn){const c=editableColls().find(x=>x.id===t.dataset.cn);if(c){c.name=t.value.trim()||c.name;Store.save()}return}
   if(t.dataset.cp){const [cid,pid,k]=t.dataset.cp.split('|'),pc=editableColls().find(x=>x.id===cid)?.pieces.find(x=>x.id===pid);if(pc){pc[k]=k==='name'?t.value.trim():Math.max(0,Number(t.value)||0);Store.save()}return}
   if(t.dataset.addpieces&&t.files.length){const c=editableColls().find(x=>x.id===t.dataset.addpieces);if(!c){alert('Could not find that collection.');return}t.disabled=true;
@@ -341,6 +390,7 @@ function openPanel(){
    Store.addProduct({id,name,cat:g('np-cat').value,sub:g('np-sub').value.trim()||g('np-cat').value,tag:g('np-tag').value.trim(),price:Number(g('np-price').value)||0,mat:g('np-mat').value.trim(),desc:g('np-desc').value.trim(),dims:['np-w','np-d','np-h'].map(i=>Number(g(i).value)||100),dimsLocked:g('np-dims-lock').checked});
    p.querySelectorAll('[data-npdefault]').forEach(s=>{if(s.value)Store.setPieceDefault(id,s.dataset.npdefault,s.value)});
    p.querySelectorAll('[data-npoptions]').forEach(i=>Store.setPieceFinishAvailability(id,i.dataset.npoptions,i.checked));
+   p.querySelectorAll('[data-nptoggleable]').forEach(i=>{if(i.checked)Store.setPieceToggleable(id,i.dataset.nptoggleable,true)});
    reload()}
   if(a==='addcoll'){const n=document.getElementById('nc-name').value.trim();if(!n){alert('Please name the collection.');return}editableColls().push({id:'c'+Date.now().toString(36),name:n,pieces:[]});Store.save();reload()}
   if(a==='expprod'){e.preventDefault();e.stopPropagation();const status=document.getElementById('repo-pub-status'),progress=document.getElementById('repo-pub-progress');
