@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex,follow">
+  <meta name="description" content="Interactive 2D Jasmine Headboard configurator concept for Good Knight Bedding, built as an XLVII portfolio demo.">
+  <title>Good Knight Bedding 2D Configurator Demo | XLVII</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#" aria-label="Good Knight Bedding home">
+        <img src="logo.png" alt="Good Knight Bedding">
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="main-nav" id="main-nav" aria-label="Main navigation">
+        <a href="#">Home</a>
+        <a href="#">Online Shop <span class="chevron">⌄</span></a>
+        <a href="#">Delivery Rates</a>
+        <a href="#">About Us</a>
+        <a href="#">Contact Us <span class="chevron">⌄</span></a>
+        <a href="#">Blog</a>
+        <a href="#">Login <span class="chevron">⌄</span></a>
+      </nav>
+      <button class="search-button" type="button" aria-label="Open search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="search-panel" aria-hidden="true">
+    <form class="search-form" role="search">
+      <label for="site-search">Search</label>
+      <input id="site-search" type="search" placeholder="Search products">
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <main class="product-page">
+    <div class="breadcrumbs">
+      <a href="#">Home</a><span>›</span><a href="#">Bedroom Furniture</a><span>›</span><strong>Jasmine Headboard</strong>
+    </div>
+    <div class="product-layout">
+      <section class="gallery" aria-label="Product gallery">
+        <button class="gallery-arrow gallery-prev" type="button" aria-label="Previous color">‹</button>
+        <img id="main-image" src="assets/DeepPurple.webp" alt="Jasmine Headboard in Deep purple">
+        <button class="gallery-arrow gallery-next" type="button" aria-label="Next color">›</button>
+      </section>
+
+      <section class="product-details">
+        <div class="product-heading-row">
+          <h1>Jasmine Headboard</h1>
+          <div class="paging"><button type="button" aria-label="Previous product">← Prev</button><button type="button" aria-label="Next product">Next →</button></div>
+        </div>
+        <div class="meta">SKU:JH-001 <span>CATEGORY: Bedroom Furniture</span> <span>TAGS: Headboard, lifestyle-main</span></div>
+        <p class="description">Our Jasmine Headboard stands 1.45 meters high. The Headboard is covered in a velvet fabric. Individually upholstered panels are mounted to a frame to provide a luxurious look.</p>
+        <div class="delivery">
+          Delivery from <strong>R150,00</strong>, charged by town. Free collection from selected stores.<br>
+          <a href="https://goodknightbedding.shop/delivery-rates/">Check your delivery cost</a>
+        </div>
+
+        <form id="configurator" class="configurator">
+          <fieldset class="size-fieldset">
+            <legend>Select Size:</legend>
+            <div class="size-options" id="size-options"></div>
+          </fieldset>
+
+          <fieldset class="colour-fieldset">
+            <legend>Colour:</legend>
+            <div class="select-wrap">
+              <select id="colour-select" aria-label="Choose headboard colour"></select>
+            </div>
+            <small class="configuration-hint" id="configuration-hint">Price will show after you select a size and colour.</small>
+          </fieldset>
+
+          <div class="variant-price" id="variant-price" aria-live="polite" hidden>
+            <strong id="price"></strong>
+            <span>9 in stock</span>
+          </div>
+
+          <div class="purchase-row">
+            <div class="quantity" aria-label="Quantity controls">
+              <button id="decrease" type="button" aria-label="Decrease quantity">−</button>
+              <output id="quantity" aria-live="polite">1</output>
+              <button id="increase" type="button" aria-label="Increase quantity">+</button>
+            </div>
+            <button class="cart-button" id="add-to-cart" type="submit" disabled>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1 12H7L6 7Z"></path><path d="M9 7V5a3 3 0 0 1 6 0v2"></path></svg>
+              <span>Add to cart</span>
+            </button>
+          </div>
+        </form>
+
+        <div class="actions">
+          <div class="social">
+            <a href="#" aria-label="WhatsApp">◉</a>
+            <a href="#" aria-label="Facebook">f</a>
+            <a href="#" aria-label="Twitter">𝕏</a>
+            <a href="#" aria-label="Pinterest">p</a>
+            <a href="#" aria-label="Email">✉</a>
+          </div>
+          <button class="wishlist" id="wishlist" type="button" aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21S3 15.5 3 8.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 9 1.5C21 15.5 12 21 12 21Z"></path></svg>
+            <span>Add to wishlist</span>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <section class="thumbnail-strip" aria-label="Headboard colour previews">
+      <button class="thumbnail-nav previous" id="thumbnail-previous" type="button" aria-label="Previous colours">‹</button>
+      <div class="thumbnail-viewport" id="thumbnail-viewport">
+        <div id="thumbnails"></div>
+      </div>
+      <button class="thumbnail-nav next" id="thumbnail-next" type="button" aria-label="Next colours">›</button>
+    </section>
+
+    <section class="accordions">
+      <details open>
+        <summary><span>Description</span><span class="accordion-arrow">⌃</span></summary>
+        <div class="accordion-content">
+          <h2>Product Details</h2>
+          <p>Our Jasmine Headboard stands 1.45 meters high. The Headboard is covered in a velvet fabric. Individually upholstered panels are mounted to a frame to provide a luxurious look. This elegant headboard is popular for all ages.</p>
+          <p><strong id="selected-summary" aria-live="polite"></strong></p>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
+</body>
+</html>

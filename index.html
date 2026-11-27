@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description"
+    content="Mukudzei Morton builds interactive 2D and 3D product configurators and web experiences that help businesses improve customer experience and online conversions.">
+  <meta name="theme-color" content="#101010">
+  <link rel="canonical" href="https://fortyseven.co.za/">
+  <link rel="icon" href="/favicon.png" type="image/svg+xml">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="XLVII">
+  <meta property="og:title" content="Mukudzei Morton | Interactive 3D Web Experiences">
+  <meta property="og:description"
+    content="Interactive 2D and 3D product configurators and web experiences by Mukudzei Morton, based in Johannesburg, South Africa.">
+  <meta property="og:url" content="https://fortyseven.co.za/">
+  <meta property="og:image" content="https://fortyseven.co.za/images/DekaraDesigns.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Mukudzei Morton | Interactive 3D Web Experiences">
+  <meta name="twitter:description"
+    content="Interactive 2D and 3D product configurators and web experiences by Mukudzei Morton, based in Johannesburg, South Africa.">
+  <meta name="twitter:image" content="https://fortyseven.co.za/images/DekaraDesigns.jpg">
+  <title>Mukudzei Morton | Interactive 3D Web Experiences &amp; Product Configurators</title>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Mukudzei Morton",
+      "url": "https://fortyseven.co.za/",
+      "email": "business@fortyseven.co.za",
+      "jobTitle": "Interactive web developer",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Fourways, Johannesburg",
+        "addressRegion": "Gauteng",
+        "addressCountry": "ZA"
+      },
+      "knowsAbout": [
+        "Interactive web experiences",
+        "2D and 3D product configurators",
+        "E-commerce customer experience"
+      ]
+    }
+  </script>
+  <style>
+    :root {
+      --bg: #101010;
+      --ink: #f2f1ec;
+      --dim: #9a988f;
+      --glass: rgba(24, 24, 24, .72);
+      --line: rgba(255, 255, 255, .14);
+      --accent: #e6f58b;
+      color-scheme: dark;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* faint dot grid like the reference */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(255, 255, 255, .07) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    /* ---------- floating header / footer ---------- */
+    .bar {
+      position: fixed;
+      z-index: 2000;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      padding: 14px 20px;
+      background: var(--glass);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    header.bar {
+      top: max(16px, env(safe-area-inset-top));
+    }
+
+    footer.bar {
+      bottom: max(16px, env(safe-area-inset-bottom));
+      padding: 10px 20px;
+      font-size: 12px;
+      color: var(--dim);
+    }
+
+    .title {
+      font-size: clamp(15px, 2.2vw, 22px);
+      font-weight: 700;
+      letter-spacing: -.02em;
+      line-height: 1.1;
+    }
+
+    .title span {
+      color: var(--dim);
+      font-weight: 400;
+    }
+
+    /* ---------- text panels (scrollable, fade out toward the panes) ---------- */
+    .copy {
+      position: fixed;
+      z-index: 1500;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--dim);
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, .25) transparent;
+      -webkit-mask-image: linear-gradient(var(--fade, 217deg), #000 0%, #000 55%, transparent 100%);
+      mask-image: linear-gradient(var(--fade, 217deg), #000 0%, #000 55%, transparent 100%);
+    }
+
+    .copy p+p {
+      margin-top: .7em;
+    }
+
+    .copy a {
+      color: var(--ink);
+      text-underline-offset: 3px;
+    }
+
+    .copy a:hover,
+    .copy a:focus-visible {
+      color: var(--accent);
+    }
+
+    .copy:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+    }
+
+    /* top and height are set by placePanels() in the script */
+    #about {
+      right: 36px;
+      top: 96px;
+      width: clamp(150px, 30vw, 320px);
+      height: 40vh;
+    }
+
+    #contact {
+      left: 36px;
+      top: 60vh;
+      width: clamp(150px, 26vw, 280px);
+      height: 30vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #contact> :first-child {
+      margin-top: auto;
+    }
+
+    /* ---------- the stage ---------- */
+    .stage {
+      position: fixed;
+      inset: 0;
+      perspective: 1800px;
+      overflow: hidden;
+    }
+
+    .pane {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: var(--w);
+      height: calc(var(--w) * .72);
+      border-radius: 14px;
+      overflow: hidden;
+      display: block;
+      color: inherit;
+      text-decoration: none;
+      background: var(--c, #ddd);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, .55);
+      will-change: transform;
+      transform-style: preserve-3d;
+    }
+
+    .pane img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .pane .ph {
+      width: 100%;
+      height: 100%;
+      padding: 8%;
+      display: flex;
+      align-items: flex-end;
+      color: #141414;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      font-size: calc(var(--w) * .13);
+      line-height: .95;
+    }
+
+    .pane .cap {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 9px;
+      background: rgba(16, 16, 16, .82);
+      color: var(--ink);
+      font-size: 12px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity .2s, transform .2s;
+    }
+
+    .pane:hover .cap,
+    .pane:focus-visible .cap {
+      opacity: 1;
+      transform: none;
+    }
+
+    .pane:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="bar">
+    <h1 class="title">Mukudzei Morton / <span>XLVII - forty seven demos.</span></h1>
+  </header>
+
+  <!-- ✏️ TOP-RIGHT TEXT: scrolls, and fades out before it reaches the panes -->
+  <section class="copy" id="about" tabindex="0" aria-label="About">
+    <p>I build interactive web tools and experiences, to improve website conversions and customer experience. Using 3D,
+      I build 2D and 3D customizers, helping businesses to offer and track interactions, properly measuring what leads
+      to a purchase online. </p>
+  </section>
+
+  <!-- ✏️ BOTTOM-LEFT TEXT: same behaviour. Email goes last so it sits closest to the corner. -->
+  <section class="copy" id="contact" tabindex="0" aria-label="Contact">
+    <p>Based in Fourways, Johannesburg.</p>
+    <p>Open to work with everyone, everywhere.</p>
+    <p><a href="mailto:business@fortyseven.co.za">business@fortyseven.co.za</a></p>
+  </section>
+
+  <main class="stage" id="stage" aria-label="Demo showcase"></main>
+
+  <footer class="bar">
+    <span>&copy; <span id="yr"></span> Mukudzei Morton / XLVII - forty seven demos. All rights reserved.</span>
+  </footer>
+
+  <script>
+    /* =====================================================================
+       ✏️ YOUR DEMOS LIVE HERE. One line = one pane.
+       -  title: shown on hover (and on the placeholder pane)
+       -  url:   where the pane links to. Either:
+                  "demos/my-demo/index.html"                       (same repo)
+                  "https://yourname.github.io/other-repo/"         (another repo)
+       -  image: screenshot path, e.g. "images/my-demo.jpg"        (same repo)
+                  leave "" to show a coloured placeholder
+       -  color: placeholder colour (only used when image is "")
+       To ADD a pane: copy a line, paste it before the closing ];
+       To REMOVE a pane: delete its line.
+       ===================================================================== */
+    const DEMOS = [
+      { title: "Dekara Design Concept Benefits", url: "Dekara Designs_ 3D showroom benefits.html", image: "images/DD_Benefits.jpg", color: "#ece6d6" },
+      { title: "Dekara Designs Furniture E-commerce with 3D Concept", url: "https://mm-hachi.github.io/Studio/", image: "images/DekaraDesigns.jpg", color: "#e6f58b" },
+      { title: "Good Knight Bedding 2D Configurator", url: "GoodKnightBedding_2D_Configurator/index.html", image: "images/GoodKnightBedding.jpg", color: "#d9d6ff" },
+      { title: "Timbur 2D Configurator", url: "timbur_2D_configurator/index.html", image: "images/timbur.jpg", color: "#c8174a" },
+      { title: "Draughting Services", url: "draughting.html", image: "images/DraughtingServices.jpg", color: "#f7c9d4" },
+    ];
+
+    /* Motion settings (optional tweaks) */
+    const SPEED = 0.018;   // laps per second: higher = faster
+    const TILT = { x: 8, y: -16, z: -3 }; // 3D lean of each pane, in degrees
+
+    /* ---------- no need to edit below this line ---------- */
+    document.getElementById("yr").textContent = new Date().getFullYear();
+
+    const stage = document.getElementById("stage");
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const N = DEMOS.length;
+    const SPAN = 1.5;                 // track runs from t=-0.25 (below screen) to t=1.25 (above)
+    let offset = 0, speed = SPEED, target = SPEED, last = performance.now();
+
+    const panes = DEMOS.map(d => {
+      const a = document.createElement("a");
+      a.className = "pane";
+      a.href = d.url;
+      if (/^https?:/.test(d.url)) { a.target = "_blank"; a.rel = "noopener"; }
+      a.style.setProperty("--c", d.color || "#ddd");
+      if (d.image) {
+        const img = document.createElement("img");
+        img.src = d.image; img.alt = d.title; img.loading = "lazy";
+        a.appendChild(img);
+      } else {
+        const ph = document.createElement("div");
+        ph.className = "ph"; ph.textContent = d.title;
+        a.appendChild(ph);
+      }
+      const cap = document.createElement("div");
+      cap.className = "cap";
+      cap.innerHTML = "<span></span><span>Open demo</span>";
+      cap.firstChild.textContent = d.title;
+      a.appendChild(cap);
+      a.addEventListener("pointerenter", () => target = 0);
+      a.addEventListener("pointerleave", () => target = SPEED);
+      a.addEventListener("focus", () => target = 0);
+      a.addEventListener("blur", () => target = SPEED);
+      stage.appendChild(a);
+      return a;
+    });
+
+    function layout() {
+      const W = innerWidth, H = innerHeight;
+      const w = Math.max(220, Math.min(W * .34, 480));
+      const h = w * .72;
+      panes.forEach((el, i) => {
+        el.style.setProperty("--w", w + "px");
+        // position along the track, wrapped so panes re-enter from the bottom
+        let t = ((i / N) * SPAN + offset) % SPAN;
+        if (t < 0) t += SPAN;
+        t -= 0.25;
+        // diagonal path: bottom-right → top-left
+        const x = W * (0.82 - 0.78 * t) - w / 2;
+        const y = H * (1.0 - 0.95 * t) - h / 2;
+        el.style.transform =
+          `translate3d(${x}px, ${y}px, 0) rotateX(${TILT.x}deg) rotateY(${TILT.y}deg) rotateZ(${TILT.z}deg)`;
+        el.style.zIndex = String(1000 - Math.round(t * 100));
+      });
+    }
+
+    function tick(now) {
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      speed += (target - speed) * Math.min(1, dt * 5);   // ease to/from a stop
+      if (!reduce) offset += speed * dt * SPAN;
+      layout();
+      requestAnimationFrame(tick);
+    }
+
+    /* ---- text panels: sized to stop short of the panes, and fade toward them ---- */
+    const about = document.getElementById("about");
+    const contact = document.getElementById("contact");
+    const paneW = () => Math.max(220, Math.min(innerWidth * .34, 480));
+    function placePanels() {
+      const W = innerWidth, H = innerHeight;
+      const w = paneW(), h = w * .72;
+      const k = (0.95 * H) / (0.78 * W);   // slope of the pane track
+      const gap = 24, MIN = 96;            // clear space kept from the panes
+      // fade direction: perpendicular to the track, pointing at the panes
+      const ang = Math.atan2(-0.95 * H, -0.78 * W) * 180 / Math.PI;
+      about.style.setProperty("--fade", ang + "deg");
+      contact.style.setProperty("--fade", (ang + 180) + "deg");
+
+      // top-right: stay above the panes' upper-right edge
+      const top = document.querySelector("header").getBoundingClientRect().bottom + 16;
+      const L = W - 36 - about.offsetWidth;
+      const edgeUp = (H - h / 2) + k * (L - (0.82 * W + w / 2)) - gap;
+      about.style.top = top + "px";
+      about.style.height = Math.max(MIN, Math.min(edgeUp - top, H * .6)) + "px";
+
+      // bottom-left: stay below the panes' lower-left edge
+      const bottom = document.querySelector("footer").getBoundingClientRect().top - 16;
+      const R = 36 + contact.offsetWidth;
+      const edgeLow = (H + h / 2) + k * (R - (0.82 * W - w / 2)) + gap;
+      const ch = Math.max(MIN, Math.min(bottom - edgeLow, H * .6));
+      contact.style.top = (bottom - ch) + "px";
+      contact.style.height = ch + "px";
+    }
+
+    /* scrolling inside a text panel should not spin the carousel */
+    document.querySelectorAll(".copy").forEach(el => {
+      ["wheel", "touchstart", "touchmove"].forEach(ev =>
+        el.addEventListener(ev, e => e.stopPropagation(), { passive: true }));
+    });
+
+    /* scroll wheel / touch drag nudges the carousel too */
+    addEventListener("wheel", e => { offset += e.deltaY * 0.0004; }, { passive: true });
+    let ty = null;
+    addEventListener("touchstart", e => ty = e.touches[0].clientY, { passive: true });
+    addEventListener("touchmove", e => {
+      if (ty === null) return;
+      offset += (ty - e.touches[0].clientY) * 0.0015; ty = e.touches[0].clientY;
+    }, { passive: true });
+    addEventListener("resize", () => { placePanels(); layout(); });
+
+    placePanels();
+    layout();
+    requestAnimationFrame(tick);
+  </script>
+</body>
+
+</html>

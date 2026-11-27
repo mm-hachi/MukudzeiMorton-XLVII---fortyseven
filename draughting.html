@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description"
+    content="Freelance draughting and technical drawing services by Mukudzei Morton in Johannesburg, South Africa. Available for contract, freelance and overflow work.">
+  <link rel="canonical" href="https://fortyseven.co.za/draughting.html">
+  <title>Mukudzei Morton: Draughtsman for contract, freelance and overflow work</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500&family=Barlow+Condensed:wght@500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    /* IMAGES: each placeholder shows the file name it is waiting for.
+   Save your image in an "images" folder with that exact name and it appears automatically. */
+    :root {
+      --o: #cf4a14;
+      --ink: #1d1a17;
+      --paper: #fbf8f3;
+      --mut: #6a625a;
+      --line: rgba(29, 26, 23, .16);
+      --hi: #fde9dc
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      font: 400 1rem/1.6 'Barlow', system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--o);
+      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom)
+    }
+
+    h1,
+    h2,
+    h3,
+    th,
+    .fig b {
+      font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif
+    }
+
+    a {
+      color: inherit
+    }
+
+    /* ---------- cutting mat ---------- */
+    .mat {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      background: radial-gradient(120% 100% at 15% 0, #e25a1d, #cf4a14 55%, #a8350e)
+    }
+
+    .mat::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background: repeating-linear-gradient(115deg, rgba(255, 214, 170, .16) 0 110px, transparent 110px 300px);
+      filter: blur(28px);
+      animation: drift 50s linear infinite
+    }
+
+    @keyframes drift {
+      to {
+        transform: translate3d(331px, 0, 0)
+      }
+    }
+
+    .mat::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to top right, transparent calc(50% - .5px), rgba(255, 255, 255, .55) calc(50% - .5px), rgba(255, 255, 255, .55) calc(50% + .5px), transparent calc(50% + .5px)),
+        linear-gradient(rgba(255, 255, 255, .6) 1px, transparent 1px) 0 0/120px 120px,
+        linear-gradient(90deg, rgba(255, 255, 255, .6) 1px, transparent 1px) 0 0/120px 120px,
+        linear-gradient(rgba(255, 255, 255, .15) 1px, transparent 1px) 0 0/24px 24px,
+        linear-gradient(90deg, rgba(255, 255, 255, .15) 1px, transparent 1px) 0 0/24px 24px
+    }
+
+    .mat i {
+      position: absolute;
+      background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .75) 0 1px, transparent 1px 12px);
+      z-index: 1
+    }
+
+    .mat .t {
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8px
+    }
+
+    .mat .l {
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 8px;
+      background: repeating-linear-gradient(0deg, rgba(255, 255, 255, .75) 0 1px, transparent 1px 12px)
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      .mat::before {
+        animation: none
+      }
+
+      html {
+        scroll-behavior: auto
+      }
+    }
+
+    /* ---------- layout ---------- */
+    .w {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0 clamp(1rem, 4vw, 2rem)
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: clamp(1.5rem, 4vw, 3rem);
+      align-items: center;
+      min-height: 88vh;
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+      color: #fff;
+      text-shadow: 0 1px 14px rgba(120, 30, 0, .35)
+    }
+
+    .who {
+      font-size: .95rem;
+      font-weight: 500
+    }
+
+    h1 {
+      font-size: clamp(3rem, 9vw, 6rem);
+      line-height: .92;
+      font-weight: 700;
+      letter-spacing: -.01em;
+      margin: .8rem 0 1.2rem
+    }
+
+    .lead {
+      font-size: 1.15rem;
+      max-width: 34rem
+    }
+
+    .cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .8rem;
+      margin-top: 1.6rem;
+      text-shadow: none
+    }
+
+    .btn,
+    .ghost {
+      padding: .8rem 1.3rem;
+      font-weight: 500;
+      text-decoration: none;
+      border: 2px solid #fff;
+      transition: background .15s, color .15s
+    }
+
+    .btn {
+      background: #fff;
+      color: var(--ink)
+    }
+
+    .btn:hover {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink)
+    }
+
+    .ghost {
+      color: #fff
+    }
+
+    .ghost:hover {
+      background: #fff;
+      color: var(--ink)
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--ink);
+      outline-offset: 3px
+    }
+
+    .sheet {
+      position: relative;
+      background: var(--paper);
+      padding: clamp(1.4rem, 4vw, 2.6rem);
+      margin-bottom: 1.4rem;
+      box-shadow: 0 20px 50px rgba(90, 20, 0, .28)
+    }
+
+    .sheet::after {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border: 1px solid rgba(29, 26, 23, .28);
+      pointer-events: none
+    }
+
+    h2 {
+      font-size: clamp(1.9rem, 4vw, 2.6rem);
+      line-height: 1;
+      font-weight: 600;
+      margin-bottom: .9rem
+    }
+
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: .4rem
+    }
+
+    .sub {
+      color: var(--mut);
+      max-width: 40rem;
+      margin-bottom: 1rem
+    }
+
+    ul {
+      list-style: none
+    }
+
+    li {
+      padding: .6rem 0;
+      border-bottom: 1px solid var(--line)
+    }
+
+    li b {
+      font-weight: 500
+    }
+
+    .sc {
+      overflow-x: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .95rem;
+      min-width: 620px
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: .7rem .7rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top
+    }
+
+    th {
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: var(--mut)
+    }
+
+    td:first-child {
+      font-weight: 500;
+      width: 24%
+    }
+
+    td.n {
+      color: var(--mut)
+    }
+
+    td.y {
+      background: var(--hi)
+    }
+
+    .cols {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-top: .6rem
+    }
+
+    .cols div {
+      border: 1px solid var(--line);
+      padding: 1.1rem
+    }
+
+    .cols p {
+      color: var(--mut);
+      font-size: .93rem;
+      margin-bottom: .4rem
+    }
+
+    .fig {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.4rem;
+      margin-top: .8rem
+    }
+
+    .fig div {
+      border-top: 1px solid var(--ink);
+      position: relative;
+      padding-top: .8rem
+    }
+
+    .fig div::before,
+    .fig div::after {
+      content: "";
+      position: absolute;
+      top: -7px;
+      height: 13px;
+      border-left: 1px solid var(--ink)
+    }
+
+    .fig div::before {
+      left: 0
+    }
+
+    .fig div::after {
+      right: 0;
+      border-left: 0;
+      border-right: 1px solid var(--ink)
+    }
+
+    .fig b {
+      display: block;
+      font-size: 2.6rem;
+      line-height: 1;
+      font-weight: 600;
+      color: var(--o)
+    }
+
+    .fig span {
+      font-size: .92rem;
+      color: var(--mut)
+    }
+
+    .small {
+      color: var(--mut);
+      font-size: .85rem;
+      margin-top: .8rem
+    }
+
+    .gal {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: .6rem
+    }
+
+    /* image placeholders */
+    .ph {
+      position: relative;
+      aspect-ratio: 4/3;
+      margin: 0;
+      overflow: hidden;
+      background: repeating-linear-gradient(45deg, #f1e6dc 0 10px, #f7efe7 10px 20px);
+      border: 1px solid var(--line);
+      color: var(--mut)
+    }
+
+    .ph::before {
+      content: attr(data-file);
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 1rem;
+      font-size: .85rem;
+      text-shadow: none
+    }
+
+    .ph img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .ph figcaption {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: .5rem .8rem;
+      background: rgba(251, 248, 243, .92);
+      color: var(--ink);
+      font-size: .82rem;
+      text-shadow: none
+    }
+
+    .hero .ph {
+      transform: rotate(-2deg);
+      box-shadow: 0 25px 60px rgba(90, 20, 0, .4);
+      border: 0
+    }
+
+    .end {
+      text-align: center
+    }
+
+    .end .cta {
+      justify-content: center
+    }
+
+    .end .btn {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink)
+    }
+
+    .end .btn:hover {
+      background: var(--o);
+      border-color: var(--o)
+    }
+
+    footer {
+      color: #fff;
+      text-align: center;
+      font-size: .85rem;
+      padding: 1.4rem 1rem 2.4rem;
+      text-shadow: 0 1px 8px rgba(120, 30, 0, .4)
+    }
+
+    @media(max-width:760px) {
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto
+      }
+
+      .cols,
+      .fig,
+      .gal {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="mat" aria-hidden="true"><i class="t"></i><i class="l"></i></div>
+
+  <header class="w hero">
+    <div>
+      <p class="who">Mukudzei Morton · Draughtsman · Fourways, Johannesburg</p>
+      <h1>Drawings! Drafted to be built.</h1>
+      <p class="lead">Eight years of architectural, utility and mechanical draughting. Take me on for a contract, a
+        freelance drawing set, or the overflow your team can't fit in. You get clean sheets that pass approval and match
+        what happens on site.</p>
+      <p class="cta"><a class="btn" href="mailto:business@fortyseven.co.za?subject=Draughting%20enquiry">Send a drawing
+          brief</a><a class="ghost" href="#work">See what I draw</a></p>
+    </div>
+    <!-- IMAGE 1: hero. Save as images/hero-drawing.jpg -->
+    <figure class="ph" data-file="images/hero-drawing.jpg"><img src="images/hero-drawing.jpg" alt="Sample drawing sheet"
+        onerror="this.remove()"></figure>
+  </header>
+
+  <main class="w">
+    <section class="sheet">
+      <h2>Why drawing work stalls</h2>
+      <ul>
+        <li><b>Peaks outrun your team.</b> A tender or a batch of submissions lands and your draughtsman is already
+          full.</li>
+        <li><b>Submissions come back.</b> A drawing that misses a regulation costs weeks in the municipal queue.</li>
+        <li><b>The site finds the mistakes.</b> Drawing and site disagree, and the fix is most expensive once building
+          has started.</li>
+        <li><b>New hires take months.</b> Software, standards and office procedure all have to be learned before the
+          work speeds up.</li>
+      </ul>
+    </section>
+
+    <section class="sheet" id="work">
+      <h2>What I draw</h2>
+      <p class="sub">Each discipline ends in a deliverable you can submit, price or build from.</p>
+      <div class="sc">
+        <table>
+          <tr>
+            <th>Discipline</th>
+            <th>What you get</th>
+            <th>Tools</th>
+          </tr>
+          <tr>
+            <td>Architectural</td>
+            <td>Plans for proposed estate housing, existing buildings redrawn for municipal approval including
+              multi-storey complex dwellings, with energy-efficiency regulations applied.</td>
+            <td>Revit, AutoCAD</td>
+          </tr>
+          <tr>
+            <td>Utility and MEP schematics</td>
+            <td>Electrical and mechanical schematics, infrastructure route planning and survey drawings.</td>
+            <td>Revit MEP, AutoCAD Electrical, AutoCAD Civil</td>
+          </tr>
+          <tr>
+            <td>Mechanical</td>
+            <td>3D part and assembly models with ISO-standard drawings and shop drawings.</td>
+            <td>Inventor</td>
+          </tr>
+          <tr>
+            <td>Site follow-through</td>
+            <td>Revisions from site queries, shop drawings, and as-built records compiled for handover.</td>
+            <td>Revit, AutoCAD</td>
+          </tr>
+          <tr>
+            <td>3D for the web</td>
+            <td>Models for visualisation, and for the interactive configurators shown in my demos.</td>
+            <td>Blender</td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="sheet">
+      <h2>How we can work together</h2>
+      <div class="cols">
+        <div>
+          <h3>Contract</h3>
+          <p>Embedded in your team for a set period, working to your standards and templates.</p>
+          <p>Rate and terms: [edit]</p>
+        </div>
+        <div>
+          <h3>Freelance</h3>
+          <p>A defined drawing set for a fixed scope, delivered on an agreed date.</p>
+          <p>Pricing: [edit]</p>
+        </div>
+        <div>
+          <h3>Overflow</h3>
+          <p>On call for peaks, so you don't hire for a busy month and carry the cost after it.</p>
+          <p>Turnaround: [edit]</p>
+        </div>
+      </div>
+      <p class="small">Based in Fourways, Johannesburg. Open to work with everyone, everywhere.</p>
+    </section>
+
+    <section class="sheet">
+      <h2>What working with me changes</h2>
+      <div class="sc">
+        <table>
+          <tr>
+            <th>Situation</th>
+            <th>Without flexible help</th>
+            <th>With me</th>
+          </tr>
+          <tr>
+            <td>Workload peak</td>
+            <td class="n">Missed deadlines or overtime</td>
+            <td class="y">Extra capacity for exactly as long as you need it</td>
+          </tr>
+          <tr>
+            <td>Municipal submission</td>
+            <td class="n">Rework after a rejection</td>
+            <td class="y">Drawn with approval in mind, including energy-efficiency rules</td>
+          </tr>
+          <tr>
+            <td>Drawing vs site</td>
+            <td class="n">Clashes found during construction</td>
+            <td class="y">I built a system to identify site discrepancies and propose fixes</td>
+          </tr>
+          <tr>
+            <td>Office process</td>
+            <td class="n">Slow, shift-heavy production</td>
+            <td class="y">A procedure I designed cut labour cost by 50% through fewer work shifts</td>
+          </tr>
+          <tr>
+            <td>Safety and compliance</td>
+            <td class="n">Left to the site team</td>
+            <td class="y">SHEQ-aware drawings; I prepare a Job Hazard Analysis (HIRA) before maintenance tasks</td>
+          </tr>
+          <tr>
+            <td>Handover</td>
+            <td class="n">Missing or late records</td>
+            <td class="y">As-builts compiled for closeout</td>
+          </tr>
+          <tr>
+            <td>Skills</td>
+            <td class="n">Outsourced CAD training</td>
+            <td class="y">Already fluent, and I have trained staff in CAD in-house</td>
+          </tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="sheet">
+      <h2>Track record</h2>
+      <div class="fig">
+        <div><b>28 km</b><span>of fibre optic cabling routed and floated, from infrastructure route planning.</span>
+        </div>
+        <div><b>50%</b><span>lower labour cost after I designed a new site-to-survey-drawing procedure.</span></div>
+        <div><b>8 years</b><span>combined across architectural, utility and mechanical draughting.</span></div>
+      </div>
+      <p class="small">Figures come from my previous roles. Add project names or references here when you're ready.</p>
+    </section>
+
+    <section class="sheet">
+      <h2>From drawing to interactive</h2>
+      <p class="sub" style="margin-bottom:.6rem">Most draughtsmen stop at the PDF. I can carry a drawing into a 3D model
+        and, using the tools in my portfolio, into a web customiser where customers choose sizes and finishes and see
+        them live. One person, one source of truth, no hand-off between drawing office and web team.</p>
+      <p><a href="index.html">See the interactive demos</a></p>
+    </section>
+
+    <section class="sheet">
+      <h2>Sample sheets</h2>
+      <div class="gal">
+        <!-- IMAGES 2-5: save as images/sample-1.jpg ... sample-4.jpg and edit the captions -->
+        <figure class="ph" data-file="images/sample-1.jpg"><img src="images/sample-1.jpg" alt="Architectural plan"
+            onerror="this.remove()">
+          <figcaption>Architectural plan: [edit]</figcaption>
+        </figure>
+        <figure class="ph" data-file="images/sample-2.jpg"><img src="images/sample-2.jpg" alt="Utility schematic"
+            onerror="this.remove()">
+          <figcaption>Utility schematic: [edit]</figcaption>
+        </figure>
+        <figure class="ph" data-file="images/sample-3.jpg"><img src="images/sample-3.jpg" alt="Mechanical model"
+            onerror="this.remove()">
+          <figcaption>Mechanical 3D model: [edit]</figcaption>
+        </figure>
+        <figure class="ph" data-file="images/sample-4.jpg"><img src="images/sample-4.jpg" alt="3D web model"
+            onerror="this.remove()">
+          <figcaption>3D for the web: [edit]</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sheet">
+      <h2>Training and certification</h2>
+      <ul>
+        <li><b>City &amp; Guilds Level 3 Certificate in Computer Aided Design.</b> Parametric modelling, 2D drafting and
+          3D modelling.</li>
+        <li><b>Electrical Engineering N6.</b> Electrotechnics, industrial electronics and power machines, which supports
+          accurate electrical draughting.</li>
+        <li><b>Multi-Disciplinary Drawing Office Practice N4/N5.</b> Mechanical, building, electrical and structural
+          steel detailing.</li>
+        <li><b>Autodesk Revit and Inventor.</b> Certificates of completion for each.</li>
+      </ul>
+    </section>
+
+    <section class="sheet end">
+      <h2>Got drawings to produce?</h2>
+      <p class="sub" style="margin:0 auto 0">Email a short brief: what the drawings are for, the software you work in,
+        and your deadline.</p>
+      <p class="cta"><a class="btn"
+          href="mailto:business@fortyseven.co.za?subject=Draughting%20enquiry">business@fortyseven.co.za</a></p>
+    </section>
+  </main>
+
+  <footer>&copy; <span id="yr"></span> Mukudzei Morton / XLVII - forty seven demos. All rights reserved. · <a
+      href="index.html">All demos</a></footer>
+  <script>document.getElementById("yr").textContent = new Date().getFullYear()</script>
+</body>
+
+</html>

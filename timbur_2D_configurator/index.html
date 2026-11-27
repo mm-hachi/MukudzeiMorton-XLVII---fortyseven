@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="Interactive Drakensberg Pedestal configurator concept for Timbur, built as an XLVII portfolio demo.">
+  <meta name="robots" content="noindex,follow">
+  <title>Timbur 2D Configurator Demo | XLVII</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17191b;
+      --muted: #647988;
+      --line: #dedede;
+      --red: #e64a52;
+      --blue: #647d8c;
+      --page-width: 1132px;
+      font-family: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0 28px;
+      color: var(--ink);
+      background: #fff;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input { font: inherit; }
+    button { color: inherit; }
+
+    .notice {
+      display: inline-flex;
+      align-items: center;
+      height: 30px;
+      margin-top: 10px;
+      padding: 0 21px;
+      border-radius: 20px;
+      color: white;
+      background: #202020;
+      font-size: 12px;
+      letter-spacing: .16em;
+      white-space: nowrap;
+    }
+
+    .site-header {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      min-height: 65px;
+      max-width: 1248px;
+      margin: -1px auto 0;
+    }
+
+    .primary-nav, .header-actions {
+      display: flex;
+      align-items: center;
+    }
+
+    .primary-nav { gap: 38px; }
+    .primary-nav a {
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 17px;
+      white-space: nowrap;
+    }
+    .primary-nav a:hover { color: var(--muted); }
+    .shop-link::after {
+      content: "";
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      margin: 0 0 3px 6px;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: rotate(45deg);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: #777;
+      text-decoration: none;
+      font-size: 31px;
+      font-weight: 300;
+      letter-spacing: .015em;
+    }
+    .brand-mark { width: 38px; height: 42px; }
+
+    .header-actions {
+      justify-content: flex-end;
+      gap: 24px;
+    }
+    .icon-button {
+      position: relative;
+      display: grid;
+      width: 28px;
+      height: 32px;
+      padding: 0;
+      place-items: center;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .icon-button svg { width: 27px; height: 27px; }
+    .icon-button:hover { color: var(--muted); }
+    .cart-count {
+      position: absolute;
+      top: -4px;
+      right: -8px;
+      display: none;
+      min-width: 16px;
+      height: 16px;
+      padding: 0 4px;
+      border-radius: 9px;
+      color: white;
+      background: var(--red);
+      font-size: 10px;
+      line-height: 16px;
+      text-align: center;
+    }
+    .cart-count.has-items { display: block; }
+
+    .search-panel {
+      position: absolute;
+      z-index: 3;
+      top: calc(100% - 2px);
+      right: 0;
+      display: none;
+      width: min(360px, 100%);
+      padding: 15px;
+      border: 1px solid var(--line);
+      background: white;
+      box-shadow: 0 8px 22px #00000012;
+    }
+    .search-panel.is-open { display: flex; gap: 10px; }
+    .search-panel input {
+      width: 100%;
+      min-width: 0;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      outline-color: var(--blue);
+    }
+    .search-panel button {
+      border: 0;
+      padding: 0 12px;
+      color: white;
+      background: var(--ink);
+      cursor: pointer;
+    }
+
+    .breadcrumb {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 14px;
+      margin: 5px 0 18px;
+      font-size: 15px;
+    }
+    .breadcrumb a { color: inherit; text-decoration: none; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb .separator { color: #121212; font-size: 19px; line-height: 1; }
+
+    .product-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: start;
+      gap: 59px;
+      max-width: var(--page-width);
+      margin: 0 auto;
+    }
+
+    .product-visual {
+      display: grid;
+      min-width: 0;
+      aspect-ratio: 1.14 / 1;
+      place-items: center;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse at 50% 74%, #e8e7e4 0%, #f5f4f2 26%, #fbfbfa 53%, #fff 75%);
+    }
+    .product-visual img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .product-details { padding-top: 4px; }
+    h1 {
+      margin: 0;
+      font-size: clamp(29px, 3vw, 39px);
+      line-height: 1.18;
+      font-weight: 500;
+      letter-spacing: -.025em;
+    }
+    .rating {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .stars {
+      display: flex;
+      gap: 2px;
+      color: var(--muted);
+      font-size: 21px;
+      line-height: 1;
+      letter-spacing: -2px;
+    }
+    .review-count { font-size: 16px; }
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin-top: 31px;
+    }
+    .current-price {
+      color: var(--red);
+      font-size: 33px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .compare-price {
+      font-size: 15px;
+      white-space: nowrap;
+    }
+    .save-badge {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 94px;
+      height: 30px;
+      margin-left: auto;
+      padding: 0 13px;
+      border-radius: 20px;
+      color: white;
+      background: var(--red);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .tax-note { margin: 16px 0 23px; }
+
+    .option-block { margin-top: 0; }
+    .option-heading {
+      margin: 0 0 12px;
+      font-size: 17px;
+      line-height: 1.2;
+      font-weight: 400;
+    }
+    .option-heading strong { font-weight: 750; }
+    .swatch-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .swatch {
+      position: relative;
+      display: grid;
+      flex: 0 0 auto;
+      padding: 0;
+      place-items: center;
+      border: 2px solid transparent;
+      background: transparent;
+      cursor: pointer;
+      transition: border-color .15s ease, transform .15s ease;
+    }
+    .swatch:hover { transform: translateY(-1px); }
+    .swatch:focus-visible, .icon-button:focus-visible, .quantity button:focus-visible,
+    .add-to-cart:focus-visible, .search-panel button:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 3px;
+    }
+    .swatch.is-selected { border-color: #202020; }
+    .swatch-color {
+      display: block;
+      width: 47px;
+      height: 47px;
+      border: 1px solid #e4e4e4;
+      border-radius: 50%;
+    }
+    .cabinet-swatch { width: 50px; height: 50px; border-radius: 50%; }
+    .cabinet-swatch .swatch-color { width: 47px; height: 47px; }
+    .timber-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 19px;
+      max-width: 490px;
+    }
+    .timber-swatch {
+      width: 66px;
+      height: 66px;
+      border-radius: 1px;
+    }
+    .timber-swatch .swatch-color {
+      width: 62px;
+      height: 62px;
+      border-radius: 0;
+    }
+    .timber-swatch.is-selected { border-color: #202020; }
+    .timber-swatch.is-selected .swatch-color { border-color: transparent; }
+    .timber-swatch .swatch-color::after {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 100%;
+      background-image: repeating-linear-gradient(26deg, transparent 0 4px, #39241424 5px, transparent 6px 9px);
+    }
+    .french-oak {
+      background-color: #c9a981;
+      background-image:
+        repeating-linear-gradient(15deg, transparent 0 6px, #f3e5cf77 7px, transparent 8px 12px),
+        repeating-linear-gradient(95deg, #76553718 0 1px, transparent 2px 6px);
+    }
+    .walnut {
+      background-color: #98450f;
+      background-image:
+        repeating-linear-gradient(14deg, transparent 0 5px, #f0a53c55 6px, transparent 7px 12px),
+        repeating-linear-gradient(95deg, #3c1a0e44 0 2px, transparent 3px 8px);
+    }
+    .handle-options {
+      padding-left: 0;
+    }
+    .handle-options .swatch-row { gap: 11px; }
+    .handle-swatch { width: 50px; height: 50px; border-radius: 50%; }
+    .handle-swatch .swatch-color { width: 47px; height: 47px; }
+    .brass { background: #c9a344; }
+    .matte-black { background: #202020; }
+
+    .purchase-bar {
+      position: sticky;
+      z-index: 2;
+      bottom: 0;
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) minmax(290px, 365px) 119px 128px;
+      align-items: center;
+      gap: 9px;
+      max-width: var(--page-width);
+      min-height: 61px;
+      margin: 39px auto 0;
+      padding: 6px 9px;
+      border: 1px solid #dedede;
+      background: #fffffffa;
+      backdrop-filter: blur(8px);
+    }
+    .summary-product {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: 14px;
+      padding-left: 0;
+    }
+    .summary-product img {
+      width: 40px;
+      height: 44px;
+      flex: 0 0 auto;
+      object-fit: contain;
+    }
+    .summary-product span {
+      overflow: hidden;
+      font-size: 17px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .variant-summary {
+      display: flex;
+      min-width: 0;
+      height: 46px;
+      align-items: center;
+      overflow: hidden;
+      padding: 0 11px;
+      border: 1px solid #d5d5d5;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .variant-summary span { overflow: hidden; text-overflow: ellipsis; }
+    .quantity {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      height: 46px;
+      border: 1px solid #d5d5d5;
+    }
+    .quantity button {
+      display: grid;
+      padding: 0;
+      place-items: center;
+      border: 0;
+      background: transparent;
+      font-size: 19px;
+      cursor: pointer;
+    }
+    .quantity button:hover { background: #f3f3f3; }
+    .quantity output { align-self: center; text-align: center; font-size: 14px; }
+    .add-to-cart {
+      height: 46px;
+      border: 0;
+      color: white;
+      background: #202020;
+      cursor: pointer;
+      transition: background .15s ease;
+    }
+    .add-to-cart:hover { background: #414141; }
+    .cart-feedback {
+      position: absolute;
+      right: 10px;
+      bottom: calc(100% + 8px);
+      padding: 9px 13px;
+      color: white;
+      background: #202020;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(3px);
+      transition: opacity .16s ease, transform .16s ease;
+    }
+    .cart-feedback.is-visible { opacity: 1; transform: translateY(0); }
+
+    .disclaimer {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      max-width: var(--page-width);
+      margin: 8px auto 9px;
+      color: #748493;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .disclaimer p { margin: 0; }
+
+    .admin-panel {
+      max-width: var(--page-width);
+      margin: 24px auto 36px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+    .admin-panel > summary {
+      padding: 15px 18px;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    .admin-content {
+      display: grid;
+      gap: 20px;
+      padding: 0 18px 20px;
+      border-top: 1px solid var(--line);
+    }
+    .admin-description {
+      max-width: 760px;
+      margin: 15px 0 0;
+      color: #536270;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .admin-current {
+      display: grid;
+      gap: 5px;
+      padding: 13px;
+      background: #f5f6f6;
+      font-size: 14px;
+    }
+    .admin-current strong { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; }
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .admin-field { display: grid; gap: 6px; min-width: 0; }
+    .admin-field label { font-size: 13px; font-weight: 650; }
+    .admin-field select {
+      width: 100%;
+      min-width: 0;
+      height: 40px;
+      padding: 0 9px;
+      border: 1px solid #cfcfcf;
+      border-radius: 0;
+      color: var(--ink);
+      background: white;
+    }
+    .admin-path {
+      overflow-wrap: anywhere;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      background: #fafafa;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 13px;
+    }
+    .admin-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+    .admin-button {
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid #202020;
+      color: white;
+      background: #202020;
+      cursor: pointer;
+    }
+    .admin-button.secondary { color: #202020; background: white; }
+    .admin-button:disabled { opacity: .48; cursor: not-allowed; }
+    .admin-button:not(:disabled):hover { background: #454545; color: white; }
+    .admin-status {
+      min-height: 20px;
+      margin: 0;
+      color: #435b69;
+      font-size: 13px;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+    .coverage-heading { margin: 0; font-size: 15px; }
+    .coverage-count { margin: 5px 0 0; color: #536270; font-size: 13px; }
+    .coverage-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 7px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .coverage-item {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+      padding: 9px;
+      border: 1px solid var(--line);
+      background: white;
+      text-align: left;
+      cursor: pointer;
+    }
+    .coverage-item:hover, .coverage-item.is-target { border-color: var(--blue); }
+    .coverage-item:focus-visible, .admin-button:focus-visible, .admin-field select:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 2px;
+    }
+    .coverage-variant { font-size: 12px; line-height: 1.35; }
+    .coverage-state { color: #687986; font-size: 11px; }
+
+    @media (max-width: 900px) {
+      body { padding: 0 22px; }
+      .primary-nav { gap: 18px; }
+      .primary-nav a { font-size: 15px; }
+      .header-actions { gap: 13px; }
+      .product-layout { gap: 32px; }
+      .price-row { gap: 14px; }
+      .current-price { font-size: 29px; }
+      .timber-options { gap: 18px; }
+      .purchase-bar {
+        grid-template-columns: minmax(170px, 1fr) minmax(250px, 1.15fr) 108px 120px;
+      }
+    }
+
+    @media (max-width: 680px) {
+      body { padding: 0 16px; }
+      .notice { height: 26px; padding: 0 14px; font-size: 10px; }
+      .site-header {
+        grid-template-columns: 1fr auto;
+        min-height: 62px;
+      }
+      .primary-nav {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 1px 0 10px;
+      }
+      .primary-nav a { font-size: 14px; }
+      .brand { grid-column: 1; grid-row: 1; font-size: 26px; }
+      .brand-mark { width: 31px; height: 35px; }
+      .header-actions { grid-column: 2; grid-row: 1; gap: 10px; }
+      .header-actions .icon-button { width: 24px; }
+      .header-actions .icon-button svg { width: 23px; height: 23px; }
+      .search-panel { top: 100%; }
+      .breadcrumb {
+        justify-content: flex-start;
+        gap: 8px;
+        margin: 13px 0 14px;
+        font-size: 13px;
+      }
+      .product-layout { grid-template-columns: 1fr; gap: 19px; }
+      .product-visual { aspect-ratio: 1.08 / 1; }
+      .product-details { padding: 0 2px; }
+      h1 { font-size: 31px; }
+      .price-row { margin-top: 22px; gap: 10px; }
+      .current-price { font-size: 28px; }
+      .compare-price { font-size: 13px; }
+      .save-badge { min-width: 73px; height: 26px; padding: 0 8px; font-size: 10px; }
+      .tax-note { margin: 13px 0 19px; }
+      .timber-options { grid-template-columns: 1fr 1fr; max-width: 420px; }
+      .purchase-bar {
+        grid-template-columns: minmax(0, 1fr) 102px 112px;
+        gap: 7px;
+        margin-top: 25px;
+        padding: 6px;
+      }
+      .summary-product { grid-column: 1 / 2; }
+      .summary-product img { width: 32px; height: 37px; }
+      .summary-product span { font-size: 14px; }
+      .variant-summary { grid-column: 1 / -1; grid-row: 2; height: 38px; font-size: 12px; }
+      .quantity, .add-to-cart { height: 40px; }
+      .quantity { grid-column: 2; grid-row: 1; }
+      .add-to-cart { grid-column: 3; grid-row: 1; font-size: 13px; }
+      .disclaimer { margin: 8px auto 12px; font-size: 12px; }
+      .admin-grid { grid-template-columns: 1fr; }
+      .coverage-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 370px) {
+      body { padding: 0 11px; }
+      .header-actions { gap: 6px; }
+      .primary-nav a { font-size: 13px; }
+      .price-row { flex-wrap: wrap; }
+      .save-badge { margin-left: 0; }
+      .swatch-row { gap: 8px; }
+      .cabinet-swatch, .handle-swatch { width: 46px; height: 46px; }
+      .cabinet-swatch .swatch-color, .handle-swatch .swatch-color { width: 43px; height: 43px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="notice">CONCEPT MOCKUP · NOT LIVE</div>
+
+  <header class="site-header">
+    <nav class="primary-nav" aria-label="Main navigation">
+      <a href="#home">Home</a>
+      <a class="shop-link" href="#shop">Shop Now</a>
+      <a href="#blog">Blog</a>
+      <a href="#gallery">Gallery</a>
+    </nav>
+
+    <a class="brand" href="#home" aria-label="Timbur home">
+      <svg class="brand-mark" viewBox="0 0 42 46" fill="none" aria-hidden="true">
+        <path d="M7 4L11 25L35 21M11 25L5 39M11 25L34 40" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M0 25H13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M43 6V41" stroke="currentColor" stroke-width="1.2"/>
+      </svg>
+      <span>timbur</span>
+    </a>
+
+    <div class="header-actions" aria-label="Quick links">
+      <button class="icon-button" id="search-toggle" type="button" aria-label="Open search" aria-expanded="false">
+        <svg viewBox="0 0 28 28" fill="none" aria-hidden="true"><circle cx="12.2" cy="12.2" r="8.2" stroke="currentColor" stroke-width="2.2"/><path d="M18.3 18.3L24 24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
+      <a class="icon-button" href="#account" aria-label="Account">
+        <svg viewBox="0 0 28 28" fill="none" aria-hidden="true"><circle cx="14" cy="8" r="4.3" stroke="currentColor" stroke-width="2.2"/><path d="M5.2 24V21.8C5.2 18.7 7.7 16.2 10.8 16.2H17.2C20.3 16.2 22.8 18.7 22.8 21.8V24" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </a>
+      <button class="icon-button" id="wishlist-toggle" type="button" aria-label="Add to wishlist" aria-pressed="false">
+        <svg viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M24.1 9.5C24.1 15.1 14 22.4 14 22.4S3.9 15.1 3.9 9.5C3.9 6.5 6 4.5 8.8 4.5C11.1 4.5 12.9 5.9 14 7.6C15.1 5.9 16.9 4.5 19.2 4.5C22 4.5 24.1 6.5 24.1 9.5Z" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <a class="icon-button" href="#cart" aria-label="Cart">
+        <svg viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M6.5 9.1H21.5L23 22.8C23.1 23.8 22.3 24.6 21.3 24.6H6.7C5.7 24.6 4.9 23.8 5 22.8L6.5 9.1Z" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/><path d="M9.5 10V7.5C9.5 5 11.5 3 14 3C16.5 3 18.5 5 18.5 7.5V10" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M11 14.2V16.2M17 14.2V16.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="cart-count" id="cart-count" aria-live="polite">0</span>
+      </a>
+    </div>
+    <form class="search-panel" id="search-panel" role="search">
+      <input type="search" aria-label="Search products" placeholder="Search products">
+      <button type="submit">Search</button>
+    </form>
+  </header>
+
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="#home">Home</a><span class="separator" aria-hidden="true">›</span>
+    <a href="#all">All</a><span class="separator" aria-hidden="true">›</span>
+    <span aria-current="page">Drakensberg Pedestal</span>
+  </nav>
+
+  <main>
+    <section class="product-layout" aria-label="Drakensberg Pedestal product configurator">
+      <div class="product-visual">
+        <img id="product-image" alt="Drakensberg Pedestal in Satin White with a French Oak top and Brass handles">
+      </div>
+
+      <div class="product-details">
+        <h1>Drakensberg Pedestal</h1>
+        <div class="rating" aria-label="Rated 5 out of 5 stars, 2 reviews">
+          <span class="stars" aria-hidden="true">★★★★★</span>
+          <span class="review-count">2 reviews</span>
+        </div>
+
+        <div class="price-row" aria-live="polite">
+          <span class="current-price" id="current-price">R 3,750.00</span>
+          <s class="compare-price" id="compare-price">R 3,995.00</s>
+          <span class="save-badge" id="save-badge">SAVE 6%</span>
+        </div>
+        <p class="tax-note">Tax included.</p>
+
+        <section class="option-block" aria-labelledby="cabinet-label">
+          <h2 class="option-heading" id="cabinet-label"><strong>Cabinet Colour:</strong> <span id="cabinet-value">Satin White</span></h2>
+          <div class="swatch-row" role="group" aria-label="Cabinet colour">
+            <button class="swatch cabinet-swatch is-selected" type="button" data-option="cabinet" data-value="satin-white" aria-label="Satin White" aria-pressed="true" title="Satin White"><span class="swatch-color" style="background:#fff"></span></button>
+            <button class="swatch cabinet-swatch" type="button" data-option="cabinet" data-value="light-grey" aria-label="Light Grey" aria-pressed="false" title="Light Grey"><span class="swatch-color" style="background:#c9ced0"></span></button>
+            <button class="swatch cabinet-swatch" type="button" data-option="cabinet" data-value="charcoal" aria-label="Charcoal" aria-pressed="false" title="Charcoal"><span class="swatch-color" style="background:#858585"></span></button>
+            <button class="swatch cabinet-swatch" type="button" data-option="cabinet" data-value="black" aria-label="Black" aria-pressed="false" title="Black"><span class="swatch-color" style="background:#151515"></span></button>
+          </div>
+        </section>
+
+        <div class="timber-options">
+          <section class="option-block" aria-labelledby="timber-label">
+            <h2 class="option-heading" id="timber-label"><strong>Timber:</strong> <span id="timber-value">French Oak</span></h2>
+            <div class="swatch-row" role="group" aria-label="Timber finish">
+              <button class="swatch timber-swatch is-selected" type="button" data-option="timber" data-value="french-oak" aria-label="French Oak" aria-pressed="true" title="French Oak"><span class="swatch-color french-oak"></span></button>
+              <button class="swatch timber-swatch" type="button" data-option="timber" data-value="walnut" aria-label="Walnut" aria-pressed="false" title="Walnut"><span class="swatch-color walnut"></span></button>
+            </div>
+          </section>
+          <section class="option-block handle-options" aria-labelledby="handle-label">
+            <h2 class="option-heading" id="handle-label"><strong>Handle Colour:</strong> <span id="handle-value">Brass</span></h2>
+            <div class="swatch-row" role="group" aria-label="Handle colour">
+              <button class="swatch handle-swatch is-selected" type="button" data-option="handle" data-value="brass" aria-label="Brass" aria-pressed="true" title="Brass"><span class="swatch-color brass"></span></button>
+              <button class="swatch handle-swatch" type="button" data-option="handle" data-value="matte-black" aria-label="Matte Black" aria-pressed="false" title="Matte Black"><span class="swatch-color matte-black"></span></button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="purchase-bar" aria-label="Order summary">
+      <div class="summary-product">
+        <img id="summary-image" alt="">
+        <span>Drakensberg Pedestal</span>
+      </div>
+      <div class="variant-summary" aria-live="polite"><span id="variant-summary">Satin White / French Oak / Brass - R 3,750.00</span></div>
+      <div class="quantity" aria-label="Quantity selector">
+        <button id="decrease-quantity" type="button" aria-label="Decrease quantity">−</button>
+        <output id="quantity" aria-live="polite">1</output>
+        <button id="increase-quantity" type="button" aria-label="Increase quantity">+</button>
+      </div>
+      <button class="add-to-cart" id="add-to-cart" type="button">Add to cart</button>
+      <span class="cart-feedback" id="cart-feedback" role="status" aria-live="polite"></span>
+    </section>
+  </main>
+
+  <footer class="disclaimer">
+    <p>Illustrative layout based on the current Timbur product page. Not the live site and not yet built. Prices as shown on the site when this was prepared.</p>
+    <span aria-hidden="true">6</span>
+  </footer>
+
+  <details class="admin-panel" id="admin-panel">
+    <summary>Admin · Product image manager</summary>
+    <div class="admin-content">
+      <p class="admin-description">Choose a finish combination, then pick an image from anywhere on your device. Uploads are saved in this browser, like Dekara gallery images, and stay available after you close the tab. Pick another image to replace it, or remove your custom image to restore the default.</p>
+      <div class="admin-current" aria-live="polite">
+        <strong>Current customer configuration</strong>
+        <span id="admin-current-variant">Satin White / French Oak / Brass</span>
+      </div>
+      <h2 class="coverage-heading">Image coverage</h2>
+      <p class="coverage-count" id="coverage-count">0 custom images · 16 variants</p>
+      <ul class="coverage-grid" id="coverage-grid" aria-label="All product image variants"></ul>
+      <div class="admin-grid" aria-label="Image variant to manage">
+        <div class="admin-field">
+          <label for="admin-cabinet">Cabinet colour</label>
+          <select id="admin-cabinet">
+            <option value="satin-white">Satin White</option>
+            <option value="light-grey">Light Grey</option>
+            <option value="charcoal">Charcoal</option>
+            <option value="black">Black</option>
+          </select>
+        </div>
+        <div class="admin-field">
+          <label for="admin-timber">Timber</label>
+          <select id="admin-timber">
+            <option value="french-oak">French Oak</option>
+            <option value="walnut">Walnut</option>
+          </select>
+        </div>
+        <div class="admin-field">
+          <label for="admin-handle">Handle colour</label>
+          <select id="admin-handle">
+            <option value="brass">Brass</option>
+            <option value="matte-black">Matte Black</option>
+          </select>
+        </div>
+      </div>
+      <div class="admin-path" id="admin-image-path">Default: assets/timbur-drakensburg-pedestal-foak-white-brass-v2-1200.webp</div>
+      <div class="admin-actions">
+        <button class="admin-button" id="add-variant-image" type="button">Choose image</button>
+        <button class="admin-button secondary" id="remove-variant-image" type="button" disabled>Remove custom image</button>
+        <input id="variant-image-file" type="file" accept="image/*" hidden>
+      </div>
+      <p class="admin-status" id="admin-status" role="status" aria-live="polite">Choose a variant, then choose an image.</p>
+    </div>
+  </details>
+
+  <script>
+    const options = {
+      cabinet: {
+        "satin-white": { label: "Satin White", face: "#fffefd", side: "#f6f5f2", edge: "#dedbd5" },
+        "light-grey": { label: "Light Grey", face: "#c9ced0", side: "#b8bec0", edge: "#aeb4b6" },
+        charcoal: { label: "Charcoal", face: "#858585", side: "#707070", edge: "#656565" },
+        black: { label: "Black", face: "#191a1b", side: "#111213", edge: "#080909" }
+      },
+      timber: {
+        "french-oak": { label: "French Oak", color: "#c9a981", grain: "#775536" },
+        walnut: { label: "Walnut", color: "#94430f", grain: "#401b0d", priceAdjustment: 450 }
+      },
+      handle: {
+        brass: { label: "Brass", color: "#c9a344" },
+        "matte-black": { label: "Matte Black", color: "#202020" }
+      }
+    };
+
+    // Drop exported images in ./assets/ using the variant filename convention.
+    // Missing files use the matching built-in SVG preview.
+    const imageMap = Object.fromEntries(
+      Object.keys(options.cabinet).flatMap(cabinet =>
+        Object.keys(options.timber).flatMap(timber =>
+          Object.keys(options.handle).map(handle => {
+            const key = `${cabinet}|${timber}|${handle}`;
+            return [key, `assets/cabinet-${cabinet}-timber-${timber}-handle-${handle}.jpg`];
+          })
+        )
+      )
+    );
+    const providedWebpImages = {
+      "satin-white|french-oak|brass": "timbur-drakensburg-pedestal-foak-white-brass-1200.webp",
+      "satin-white|french-oak|matte-black": "timbur-drakensburg-pedestal-foak-white-matte-1200.webp",
+      "satin-white|walnut|brass": "timbur-drakensburg-pedestal-kiaat-white-brass-1200.webp",
+      "satin-white|walnut|matte-black": "timbur-drakensburg-pedestal-kiaat-white-matte-1200.webp",
+      "light-grey|french-oak|brass": "timbur-drakensburg-pedestal-foak-lgrey-brass-1200.webp",
+      "light-grey|french-oak|matte-black": "timbur-drakensburg-pedestal-foak-lgrey-matte-1200.webp",
+      "light-grey|walnut|brass": "timbur-drakensburg-pedestal-kiaat-lgrey-brass-1200.webp",
+      "light-grey|walnut|matte-black": "timbur-drakensburg-pedestal-kiaat-lgrey-matte-1200.webp",
+      "charcoal|french-oak|brass": "timbur-drakensburg-pedestal-foak-dgrey-brass-1200.webp",
+      "charcoal|french-oak|matte-black": "timbur-drakensburg-pedestal-foak-dgrey-matte-1200.webp",
+      "charcoal|walnut|brass": "timbur-drakensburg-pedestal-kiaat-dgrey-brass-1200.webp",
+      "charcoal|walnut|matte-black": "timbur-drakensburg-pedestal-kiaat-dgrey-matte-1200.webp",
+      "black|french-oak|brass": "timbur-drakensburg-pedestal-foak-black-brass-1200.webp",
+      "black|french-oak|matte-black": "timbur-drakensburg-pedestal-foak-black-matte-1200.webp",
+      "black|walnut|brass": "timbur-drakensburg-pedestal-kiaat-black-brass-1200.webp",
+      "black|walnut|matte-black": "timbur-drakensburg-pedestal-kiaat-black-matte-1200.webp"
+    };
+    for (const [key, filename] of Object.entries(providedWebpImages)) {
+      imageMap[key] = `assets/${filename}`;
+    }
+    const state = { cabinet: "satin-white", timber: "french-oak", handle: "brass", quantity: 1, cart: 0 };
+    const productImage = document.querySelector("#product-image");
+    const summaryImage = document.querySelector("#summary-image");
+    const feedback = document.querySelector("#cart-feedback");
+    let feedbackTimer;
+    const customImageUrls = new Map();
+    const customImageNames = new Map();
+    const adminControls = {
+      cabinet: document.querySelector("#admin-cabinet"),
+      timber: document.querySelector("#admin-timber"),
+      handle: document.querySelector("#admin-handle")
+    };
+
+    function formatPrice(amount) {
+      const whole = Math.floor(amount).toLocaleString("en-US");
+      const cents = String(Math.round((amount % 1) * 100)).padStart(2, "0");
+      return `R ${whole}.${cents}`;
+    }
+
+    function currentPrice() {
+      return 3750 + (options.timber[state.timber].priceAdjustment || 0);
+    }
+
+    function variantKey(cabinet, timber, handle) {
+      return `${cabinet}|${timber}|${handle}`;
+    }
+
+    function adminVariantKey() {
+      return variantKey(adminControls.cabinet.value, adminControls.timber.value, adminControls.handle.value);
+    }
+
+    let adminDatabasePromise;
+    function openAdminDatabase() {
+      if (!("indexedDB" in window)) {
+        return Promise.reject(new Error("This browser does not support saving uploaded images."));
+      }
+      if (!adminDatabasePromise) {
+        adminDatabasePromise = new Promise((resolve, reject) => {
+          const request = indexedDB.open("timbur-configurator-images", 1);
+          request.onupgradeneeded = () => request.result.createObjectStore("images");
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error || new Error("Could not open image storage."));
+          request.onblocked = () => reject(new Error("Image storage is blocked by another open page."));
+        });
+      }
+      return adminDatabasePromise;
+    }
+
+    async function saveVariantImage(key, file) {
+      const database = await openAdminDatabase();
+      return new Promise((resolve, reject) => {
+        const transaction = database.transaction("images", "readwrite");
+        transaction.objectStore("images").put({ blob: file, name: file.name, type: file.type }, key);
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error || new Error("Could not save this image."));
+        transaction.onabort = () => reject(transaction.error || new Error("Saving this image was cancelled."));
+      });
+    }
+
+    async function deleteVariantImage(key) {
+      const database = await openAdminDatabase();
+      return new Promise((resolve, reject) => {
+        const transaction = database.transaction("images", "readwrite");
+        transaction.objectStore("images").delete(key);
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error || new Error("Could not remove this image."));
+        transaction.onabort = () => reject(transaction.error || new Error("Removing this image was cancelled."));
+      });
+    }
+
+    async function restoreVariantImages() {
+      const database = await openAdminDatabase();
+      await new Promise((resolve, reject) => {
+        const request = database.transaction("images", "readonly").objectStore("images").openCursor();
+        request.onsuccess = () => {
+          const cursor = request.result;
+          if (!cursor) {
+            resolve();
+            return;
+          }
+          const record = cursor.value;
+          if (record?.blob instanceof Blob && Object.hasOwn(imageMap, cursor.key)) {
+            customImageUrls.set(cursor.key, URL.createObjectURL(record.blob));
+            customImageNames.set(cursor.key, record.name || "Custom image");
+          }
+          cursor.continue();
+        };
+        request.onerror = () => reject(request.error || new Error("Could not load saved images."));
+      });
+    }
+
+    function renderCoverage() {
+      const grid = document.querySelector("#coverage-grid");
+      const fragment = document.createDocumentFragment();
+      for (const [cabinet, cabinetInfo] of Object.entries(options.cabinet)) {
+        for (const [timber, timberInfo] of Object.entries(options.timber)) {
+          for (const [handle, handleInfo] of Object.entries(options.handle)) {
+            const key = variantKey(cabinet, timber, handle);
+            const button = document.createElement("button");
+            button.className = "coverage-item";
+            button.type = "button";
+            button.dataset.variantKey = key;
+            button.setAttribute("aria-pressed", "false");
+            button.innerHTML = `<span class="coverage-variant">${cabinetInfo.label} / ${timberInfo.label} / ${handleInfo.label}</span><span class="coverage-state"></span>`;
+            button.addEventListener("click", () => {
+              adminControls.cabinet.value = cabinet;
+              adminControls.timber.value = timber;
+              adminControls.handle.value = handle;
+              updateAdminPanel();
+            });
+            fragment.append(button);
+          }
+        }
+      }
+      grid.replaceChildren(fragment);
+      updateAdminPanel();
+    }
+
+    function updateAdminCurrent() {
+      document.querySelector("#admin-current-variant").textContent =
+        `${options.cabinet[state.cabinet].label} / ${options.timber[state.timber].label} / ${options.handle[state.handle].label}`;
+    }
+
+    function updateAdminPanel() {
+      const key = adminVariantKey();
+      const isCustom = customImageUrls.has(key);
+      document.querySelector("#admin-image-path").textContent = isCustom
+        ? `Custom image: ${customImageNames.get(key)}`
+        : `Default: ${imageMap[key]}`;
+      document.querySelector("#coverage-count").textContent =
+        `${customImageUrls.size} custom images · ${Object.keys(imageMap).length} variants`;
+      for (const button of document.querySelectorAll(".coverage-item")) {
+        const isTarget = button.dataset.variantKey === key;
+        const hasImage = customImageUrls.has(button.dataset.variantKey);
+        button.classList.toggle("is-target", isTarget);
+        button.setAttribute("aria-pressed", String(isTarget));
+        button.querySelector(".coverage-state").textContent = hasImage ? "Custom image" : "Default image";
+      }
+      document.querySelector("#remove-variant-image").disabled = !isCustom;
+    }
+
+    function setAdminStatus(message) {
+      document.querySelector("#admin-status").textContent = message;
+    }
+
+    async function restoreAdminImages() {
+      try {
+        await restoreVariantImages();
+        updateAdminPanel();
+        updateImage();
+        setAdminStatus("Saved images are ready. Choose a variant to replace or remove its custom image.");
+      } catch (error) {
+        updateAdminPanel();
+        setAdminStatus(`Could not load saved images: ${error.message}`);
+      }
+    }
+
+    function svgPreview() {
+      const cabinet = options.cabinet[state.cabinet];
+      const timber = options.timber[state.timber];
+      const handle = options.handle[state.handle];
+      const woodGrain = state.timber === "walnut" ? "#e5a14c" : "#f1dfc7";
+      const faceHighlight = state.cabinet === "black" ? "#313233" : "#ffffff";
+      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 590">
+        <defs>
+          <linearGradient id="top" x1="0" y1="0" x2="0.9" y2="1"><stop stop-color="${timber.color}"/><stop offset="1" stop-color="${state.timber === "walnut" ? "#6f310f" : "#e2c7a2"}"/></linearGradient>
+          <linearGradient id="front" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${faceHighlight}"/><stop offset="1" stop-color="${cabinet.face}"/></linearGradient>
+          <linearGradient id="side" x1="0" y1="0" x2="1" y2="0"><stop stop-color="${cabinet.side}"/><stop offset="1" stop-color="${cabinet.edge}"/></linearGradient>
+          <filter id="shadow" x="-25%" y="-25%" width="150%" height="170%"><feGaussianBlur stdDeviation="13"/></filter>
+          <pattern id="grain" width="100" height="44" patternUnits="userSpaceOnUse" patternTransform="skewY(-7)">
+            <path d="M0 8C25 4 52 13 100 6M-8 22C30 17 64 28 108 19M0 36C36 32 70 39 100 32" fill="none" stroke="${woodGrain}" stroke-opacity=".5" stroke-width="1.3"/>
+            <path d="M4 13C28 11 67 18 98 12M6 29C39 25 62 34 95 27" fill="none" stroke="#fff4e5" stroke-opacity=".38" stroke-width="1"/>
+          </pattern>
+        </defs>
+        <ellipse cx="339" cy="496" rx="157" ry="24" fill="#77736d" opacity=".2" filter="url(#shadow)"/>
+        <path d="M211 447L416 454V501L399 508V477L229 468V497L211 490Z" fill="${cabinet.side}" opacity=".72"/>
+        <path d="M225 206L392 226L500 195V445L392 490L225 459Z" fill="url(#side)" stroke="${cabinet.edge}" stroke-opacity=".55" stroke-width="1.5"/>
+        <path d="M225 206L392 226V490L225 459Z" fill="url(#front)" stroke="${cabinet.edge}" stroke-opacity=".7" stroke-width="1.5"/>
+        <path d="M225 206L392 226V490L225 459Z" fill="none" stroke="#fff" stroke-opacity="${state.cabinet === "black" ? ".08" : ".55"}" stroke-width="1"/>
+        <path d="M226 333L392 357" stroke="${cabinet.edge}" stroke-opacity=".55" stroke-width="2"/>
+        <path d="M241 235L363 250L363 320L241 303Z" fill="none" stroke="${cabinet.edge}" stroke-opacity=".19" stroke-width="2"/>
+        <path d="M241 360L363 378L363 452L241 430Z" fill="none" stroke="${cabinet.edge}" stroke-opacity=".22" stroke-width="2"/>
+        <path d="M267 283L326 291" stroke="${handle.color}" stroke-width="7" stroke-linecap="round"/>
+        <path d="M272 281L272 288M322 288L322 295" stroke="${handle.color}" stroke-width="3"/>
+        <path d="M267 409L326 418" stroke="${handle.color}" stroke-width="7" stroke-linecap="round"/>
+        <path d="M272 407L272 414M322 415L322 422" stroke="${handle.color}" stroke-width="3"/>
+        <path d="M208 186L385 157L510 190L392 223Z" fill="url(#top)" stroke="#ab8d6a" stroke-width="1"/>
+        <path d="M208 186L385 157L510 190L392 223Z" fill="url(#grain)" opacity=".65"/>
+        <path d="M208 186L392 223L392 234L208 197Z" fill="${state.timber === "walnut" ? "#78380f" : "#b79770"}"/>
+        <path d="M392 223L510 190V201L392 234Z" fill="${state.timber === "walnut" ? "#612c0e" : "#a48663"}"/>
+        <path d="M226 459L392 490L392 502L226 471Z" fill="${cabinet.edge}" opacity=".75"/>
+        <path d="M236 470L247 472V499L236 497ZM373 494L384 496V522L373 520Z" fill="${cabinet.edge}" opacity=".82"/>
+        <path d="M211 447L225 450V477L211 474ZM402 481L415 477V504L402 508Z" fill="${cabinet.side}" opacity=".85"/>
+        <path d="M218 185L385 157" stroke="#fff" stroke-opacity=".5" stroke-width="1"/>
+      </svg>`;
+    }
+
+    function updateImage() {
+      const key = `${state.cabinet}|${state.timber}|${state.handle}`;
+      const assetPath = customImageUrls.get(key) || imageMap[key];
+      const fallback = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgPreview())}`;
+      for (const image of [productImage, summaryImage]) {
+        image.dataset.assetPath = assetPath;
+        image.onerror = () => {
+          if (image.dataset.assetPath === assetPath) image.src = fallback;
+        };
+        image.src = assetPath;
+      }
+      productImage.alt = `Drakensberg Pedestal in ${options.cabinet[state.cabinet].label} with a ${options.timber[state.timber].label} top and ${options.handle[state.handle].label} handles`;
+    }
+
+    function updateSummary() {
+      const price = currentPrice();
+      const compareAt = 3995 + (options.timber[state.timber].priceAdjustment || 0);
+      const priceText = formatPrice(price);
+      document.querySelector("#cabinet-value").textContent = options.cabinet[state.cabinet].label;
+      document.querySelector("#timber-value").textContent = options.timber[state.timber].label;
+      document.querySelector("#handle-value").textContent = options.handle[state.handle].label;
+      document.querySelector("#current-price").textContent = priceText;
+      document.querySelector("#compare-price").textContent = formatPrice(compareAt);
+      document.querySelector("#save-badge").textContent = `SAVE ${Math.round((1 - price / compareAt) * 100)}%`;
+      document.querySelector("#variant-summary").textContent =
+        `${options.cabinet[state.cabinet].label} / ${options.timber[state.timber].label} / ${options.handle[state.handle].label} - ${priceText}`;
+      document.querySelector("#quantity").textContent = state.quantity;
+      updateAdminCurrent();
+    }
+
+    document.querySelectorAll(".swatch").forEach(swatch => {
+      swatch.addEventListener("click", () => {
+        const { option, value } = swatch.dataset;
+        state[option] = value;
+        adminControls[option].value = value;
+        document.querySelectorAll(`[data-option="${option}"]`).forEach(button => {
+          const selected = button === swatch;
+          button.classList.toggle("is-selected", selected);
+          button.setAttribute("aria-pressed", String(selected));
+        });
+        updateSummary();
+        updateAdminPanel();
+        updateImage();
+      });
+    });
+
+    document.querySelector("#decrease-quantity").addEventListener("click", () => {
+      state.quantity = Math.max(1, state.quantity - 1);
+      updateSummary();
+    });
+    document.querySelector("#increase-quantity").addEventListener("click", () => {
+      state.quantity += 1;
+      updateSummary();
+    });
+
+    document.querySelector("#add-to-cart").addEventListener("click", () => {
+      state.cart += state.quantity;
+      const count = document.querySelector("#cart-count");
+      count.textContent = state.cart;
+      count.classList.add("has-items");
+      feedback.textContent = `${state.quantity} ${state.quantity === 1 ? "item" : "items"} added to cart`;
+      feedback.classList.add("is-visible");
+      window.clearTimeout(feedbackTimer);
+      feedbackTimer = window.setTimeout(() => feedback.classList.remove("is-visible"), 2400);
+    });
+
+    document.querySelector("#wishlist-toggle").addEventListener("click", event => {
+      const button = event.currentTarget;
+      const saved = button.getAttribute("aria-pressed") !== "true";
+      button.setAttribute("aria-pressed", String(saved));
+      button.setAttribute("aria-label", saved ? "Remove from wishlist" : "Add to wishlist");
+      button.querySelector("svg path").setAttribute("fill", saved ? "#e64a52" : "none");
+      button.style.color = saved ? "#e64a52" : "";
+    });
+
+    const searchToggle = document.querySelector("#search-toggle");
+    const searchPanel = document.querySelector("#search-panel");
+    searchToggle.addEventListener("click", () => {
+      const isOpen = searchPanel.classList.toggle("is-open");
+      searchToggle.setAttribute("aria-expanded", String(isOpen));
+      if (isOpen) searchPanel.querySelector("input").focus();
+    });
+    searchPanel.addEventListener("submit", event => {
+      event.preventDefault();
+      searchPanel.querySelector("input").focus();
+    });
+
+    for (const select of Object.values(adminControls)) {
+      select.addEventListener("change", updateAdminPanel);
+    }
+
+    const addVariantImageButton = document.querySelector("#add-variant-image");
+    const removeVariantImageButton = document.querySelector("#remove-variant-image");
+    const variantImageInput = document.querySelector("#variant-image-file");
+    let pendingImageKey = null;
+
+    addVariantImageButton.addEventListener("click", () => {
+      pendingImageKey = adminVariantKey();
+      variantImageInput.value = "";
+      variantImageInput.click();
+    });
+
+    variantImageInput.addEventListener("change", async () => {
+      const file = variantImageInput.files[0];
+      if (!file || !pendingImageKey) return;
+
+      const key = pendingImageKey;
+      pendingImageKey = null;
+      if (!file.type.startsWith("image/") && !/\.(?:jpe?g|png|gif|webp|avif|bmp|svg|tiff?)$/i.test(file.name)) {
+        setAdminStatus("Choose an image file.");
+        return;
+      }
+
+      addVariantImageButton.disabled = true;
+      setAdminStatus(`Saving ${file.name}…`);
+      try {
+        await saveVariantImage(key, file);
+        const previousUrl = customImageUrls.get(key);
+        if (previousUrl) URL.revokeObjectURL(previousUrl);
+        customImageUrls.set(key, URL.createObjectURL(file));
+        customImageNames.set(key, file.name);
+        updateAdminPanel();
+        if (key === variantKey(state.cabinet, state.timber, state.handle)) updateImage();
+        setAdminStatus(`Saved "${file.name}" for this variant.`);
+      } catch (error) {
+        setAdminStatus(`Could not save "${file.name}": ${error.message}`);
+      } finally {
+        updateAdminPanel();
+        variantImageInput.value = "";
+      }
+    });
+
+    removeVariantImageButton.addEventListener("click", async () => {
+      const key = adminVariantKey();
+      const imageUrl = customImageUrls.get(key);
+      if (!imageUrl) return;
+      removeVariantImageButton.disabled = true;
+      setAdminStatus("Removing custom image…");
+      try {
+        await deleteVariantImage(key);
+        URL.revokeObjectURL(imageUrl);
+        customImageUrls.delete(key);
+        customImageNames.delete(key);
+        updateAdminPanel();
+        if (key === variantKey(state.cabinet, state.timber, state.handle)) updateImage();
+        setAdminStatus("Custom image removed. The default product image has been restored.");
+      } catch (error) {
+        setAdminStatus(`Could not remove custom image: ${error.message}`);
+        updateAdminPanel();
+      }
+    });
+
+    renderCoverage();
+    updateAdminCurrent();
+    updateSummary();
+    updateImage();
+    restoreAdminImages();
+  </script>
+</body>
+</html>
